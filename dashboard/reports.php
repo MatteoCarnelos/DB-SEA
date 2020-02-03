@@ -97,18 +97,18 @@
                   <div class="mt-3 form-group row">
                     <label class="col-1 col-form-label" for="initialsInput">Iniziali</label>
                     <div class="col-2">
-                      <input type="text" class="form-control text-uppercase" id="initialsInput" name="patient[initials]" required>
+                      <input type="text" class="form-control text-uppercase" id="initialsInput" name="patient[initials]" placeholder="MR" required>
                     </div>
                     <label class="offset-1 col-1 col-form-label" for="cityInput">Città</label>
                     <div class="col-3">
-                      <input type="text" class="form-control" id="cityInput" name="patient[city]" required>
+                      <input type="text" class="form-control" id="cityInput" name="patient[city]" placeholder="Roma" required>
                     </div>
                   </div>
 
                   <div class="form-group row">
                     <label class="col-1 col-form-label" for="ageInput">Età</label>
                     <div class="col-2">
-                      <input type="number" value="" max="150" class="form-control" id="ageInput" name="patient[age]" required>
+                      <input type="number" value="" max="150" class="form-control" id="ageInput" name="patient[age]" placeholder="50" required>
                     </div>
                     <label class="offset-1 col-1 col-form-label" for="genderInput">Sesso</label>
                     <div class="col-3">
@@ -133,12 +133,12 @@
                         <option selected disabled value="">Seleziona un farmaco...</option>
                         <?php
                           $query = '
-                            SELECT codice, nome
+                            SELECT codice, nome, forma
                             FROM "FARMACO"
                           ';
                           $result = pg_query($query);
                           while($medicine = pg_fetch_array($result, null, PGSQL_ASSOC))
-                            echo "<option value='{$medicine['codice']}'>{$medicine['nome']}</option>";
+                            echo "<option value='{$medicine['codice']}'>{$medicine['nome']} {$medicine['forma']}</option>";
                         ?>
                       </select>
                       <div class="input-group-append">
@@ -153,7 +153,7 @@
                   <div class="form-group row">
                     <label class="col-1 col-form-label" for="assStartInput">Data inizio</label>
                     <div class="input-group col-2">
-                      <input type="text" class="form-control datepicker startpicker" id="assStartInput" name="assumption[start]" value="" required>
+                      <input type="text" class="form-control datepicker startpicker" id="assStartInput" name="assumption[start]" value="" placeholder="<?php echo date("d-m-Y") ?>" required>
                       <div class="input-group-append">
                         <button class="btn btn-outline-secondary datepicker-toggler" type="button">
                           <i data-feather="calendar"></i>
@@ -169,17 +169,17 @@
                         </button>
                       </div>
                     </div>
-                    <small class="text-muted my-auto">Se non presente, lasciare vuoto il campo.</small>
+                    <small class="text-muted my-auto">Se ancora in corso, lasciare vuoto il campo.</small>
                   </div>
 
                   <div class="form-group row">
                     <label class="col-1 col-form-label" for="frequencyInput">Frequenza</label>
                     <div class="col-2">
-                      <input type="text" class="form-control" id="frequencyInput" name="assumption[frequency]" placeholder="es. &quot;3/settimana&quot;" required>
+                      <input type="text" class="form-control" id="frequencyInput" name="assumption[frequency]" placeholder="3/settimana" required>
                     </div>
                     <label class="col-1 offset-1 col-form-label" for="doseInput">Dosaggio</label>
                     <div class="col-2">
-                      <input type="text" class="form-control" id="doseInput" name="assumption[dose]" placeholder="es. &quot;1 pastiglia&quot;" required>
+                      <input type="text" class="form-control" id="doseInput" name="assumption[dose]" placeholder="1 pastiglia" required>
                     </div>
                   </div>
                   
@@ -225,7 +225,7 @@
                       <div class="form-group row">
                         <label class="col-1 col-form-label" for="startSymInput0">Data inizio</label>
                         <div class="input-group col-2">
-                          <input type="text" class="form-control datepicker startpicker" id="startSymInput0" name="symptoms[0][start]" value="" required>
+                          <input type="text" class="form-control datepicker startpicker" id="startSymInput0" name="symptoms[0][start]" value="" placeholder="<?php echo date("d-m-Y") ?>" required>
                           <div class="input-group-append">
                             <button class="btn btn-outline-secondary datepicker-toggler" type="button">
                               <i data-feather="calendar"></i>
@@ -241,7 +241,7 @@
                             </button>
                           </div>
                         </div>
-                        <small class="text-muted my-auto">Se non presente, lasciare vuoto il campo.</small>
+                        <small class="text-muted my-auto">Se ancora in corso, lasciare vuoto il campo.</small>
                       </div>
 
                       <div class="form-group row">
@@ -284,7 +284,10 @@
             </div>
           </div>
 
-          <h4 class="m-3">Lista segnalazioni registrate</h4>
+          <div class="d-flex justify-content-between align-items-baseline">
+            <h4 class="m-3">Lista segnalazioni registrate</h4>
+            <p class="text-dark">Numero tuple: <?php echo pg_fetch_result(pg_query('SELECT COUNT(*) FROM "SEGNALAZIONE"'), 0) ?></p>
+          </div>
 
           <table class="table table-hover">
             <thead>
@@ -293,8 +296,9 @@
                 <th scope="col">Medico</th>
                 <th scope="col">Note</th>
                 <th scope="col">Paziente</th>
-                <th scope="col">Farmaco</th>
+                <th scope="col">Assunzione</th>
                 <th scope="col">Sintomi</th>
+                <th scope="col">Azioni</th>
               </tr>
             </thead>
             <tbody>
@@ -390,7 +394,6 @@
                             {$symptom['stato']}, {$symptom['gravità']}<br>
                           </p>
                         </td>
-                      </tr>
                     ";
                   } else {
                     echo "
@@ -416,9 +419,23 @@
                     echo "
                           </div>
                         </td>
-                      </tr>
                     ";
                   }
+                  echo "
+                      <td class='align-middle'>
+                        <div class='row justify-content-center'>
+                          <button class='mb-1 btn btn-outline-danger' type='button'>
+                            <i data-feather='trash-2'></i>
+                          </button>
+                        </div>
+                        <div class='row justify-content-center'>
+                        <button class='mt-1 btn btn-outline-info' type='button'>
+                          <i data-feather='edit'></i>
+                        </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ";
                 }
               ?>
             </tbody>

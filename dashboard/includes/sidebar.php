@@ -11,8 +11,16 @@
             <i data-feather="alert-triangle"></i>Segnalazioni</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link <?php if($active == 2) echo 'active' ?>" href="medicines.php">
+            <a class="nav-link <?php if($active == 2) echo 'active' ?>" href="doctors.php">
+            <i data-feather="users"></i>Medici</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?php if($active == 3) echo 'active' ?>" href="medicines.php">
             <i data-feather="book-open"></i>Farmaci</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link <?php if($active == 4) echo 'active' ?>" href="symptoms.php">
+            <i data-feather="activity"></i>Sintomi</a>
         </li>
         </ul>
     </div>

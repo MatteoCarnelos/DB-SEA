@@ -23,7 +23,7 @@
       <!-- Sidebar -->
       <div class="row">
         <?php 
-          $active = 2;
+          $active = 3;
           include 'includes/sidebar.php';
         ?>
 
