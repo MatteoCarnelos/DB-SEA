@@ -12,19 +12,19 @@
     <script src="https://unpkg.com/feather-icons"></script>
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link href="dashboard.css" rel="stylesheet">
+    <link href="includes/dashboard.css" rel="stylesheet">
   </head>
   
   <body>
     <!-- Navbar -->
-    <?php include '_includes/navbar.html'; ?>
+    <?php include 'includes/navbar.html' ?>
     
     <div class="container-fluid">
       <!-- Sidebar -->
       <div class="row">
         <?php
           $active = 0;
-          include '_includes/sidebar.php';
+          include 'includes/sidebar.php';
         ?>
 
         <!-- Main area -->

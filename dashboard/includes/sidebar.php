@@ -17,7 +17,7 @@
         </ul>
     </div>
     <div class="mx-auto mt-auto mb-1">
-        <img src="logo-unipd.png" style="width: 75px; height: 75px;" class="img-fluid" alt="Unipd Logo">
+        <img src="includes/logo-unipd.png" style="width: 75px; height: 75px;" class="img-fluid" alt="Unipd Logo">
     </div>
     <p class="text-muted text-center"><small>Carnelos - Kumar - Provera</small></p>
     </div>
