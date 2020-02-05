@@ -11,8 +11,10 @@
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/feather-icons"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/js/bootstrap-select.min.js" integrity="sha256-+o/X+QCcfTkES5MroTdNL5zrLNGb3i4dYdWPWuq6whY=" crossorigin="anonymous"></script>
 
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.12/css/bootstrap-select.min.css" integrity="sha256-l3FykDBm9+58ZcJJtzcFvWjBZNJO40HmvebhpHXEhC0=" crossorigin="anonymous">
   <link href="includes/css/dashboard.css" rel="stylesheet">
 </head>
 
@@ -30,19 +32,15 @@
 
       <!-- Main area -->
       <main role="main" class="col-10 ml-auto px-4">
-        <div class="d-flex justify-content-between align-items-center pt-3 pb-2 mb-3 border-bottom">
-          <h2>Farmaci</h2>
-          <button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#agentsModal">
-            <i class="mr-1" data-feather="settings"></i>
-            Gestisci principi attivi
-          </button>
-        </div>
+        <h2 class="pb-2 pt-3 mb-3 border-bottom">Farmaci</h2>
 
         <?php include 'includes/handler/error_handler.php' ?>
+        <?php include 'includes/frame/alerts.php' ?>
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/medicines_manager.php' ?>
+        <?php include 'includes/manager/agents_manager.php' ?>
 
-        <div class="modal fade" data-backdrop="static" id="agentsModal">
+        <div class="modal fade" id="agentsModal">
           <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
               <div class="modal-header">
@@ -51,6 +49,7 @@
                   <span>&times;</span>
                 </button>
               </div>
+
               <div class="modal-body">
                 <table class="table table-sm table-borderless table-hover">
                   <thead>
@@ -72,41 +71,47 @@
                       $count++;
                       echo "
                         <tr>
-                          <th class='align-middle' scope='row'>
-                            $count
-                          </th>
-                          <td class='align-middle'>
-                            {$agent['nome']}
-                          </td>
-                          <td class='align-middle text-right'>
-                            <button class='btn btn-outline-danger' type='button'>
-                              <i data-feather='trash-2'></i>
-                            </button>
-                          </td>
+                          <form method='post' action='medicines.php?show&removeagent'>
+                            <input type='hidden' name='name' value='{$agent['nome']}'>
+                            <th class='align-middle' scope='row'>
+                              $count
+                            </th>
+                            <td class='align-middle cell-name'>
+                              {$agent['nome']}
+                            </td>
+                            <td class='align-middle text-right'>
+                              <button class='btn btn-outline-danger' type='submit'>
+                                <i data-feather='trash-2'></i>
+                              </button>
+                            </td>
+                          </form>
                         </tr>
                       ";
                     }
                     ?>
                     <tr>
-                      <th class="align-middle" scope="row">
-                        <?php echo $count + 1 ?>
-                      </th>
-                      <td>
-                        <input class="align-middle form-control" type="text">
-                      </td>
-                      <td class="align-middle text-right">
-                        <button class="btn btn-outline-success" type="button">
-                          <i data-feather="plus"></i>
-                        </button>
-                      </td>
+                      <form method="post" action="medicines.php?show&newagent">
+                        <th class="align-middle" scope="row">
+                          <?php echo $count + 1 ?>
+                        </th>
+                        <td>
+                          <input class="form-control align-middle" type="text" name="name" required>
+                        </td>
+                        <td class="align-middle text-right">
+                          <button class="btn btn-outline-success" type="sumbit">
+                            <i data-feather="plus"></i>
+                          </button>
+                        </td>
+                      </form>
                     </tr>
                   </tbody>
                 </table>
               </div>
+
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
-                <button type="button" class="btn btn-primary">Salva modifiche</button>
               </div>
+              </form>
             </div>
           </div>
         </div>
@@ -138,7 +143,7 @@
 
                 <div class="form-group row">
                   <label class="col-2 col-form-label" for="formInput">Forma</label>
-                  <div class="col-4">
+                  <div class="col-6">
                     <select class="custom-select" id="formInput" name="form" required>
                       <option selected disabled value="">Seleziona una forma farmaceutica...</option>
                       <option value="Compresse">Compresse</option>
@@ -161,7 +166,7 @@
 
                 <div class="form-group row">
                   <label class="col-2 col-form-label" for="administrationInput">Somministrazione</label>
-                  <div class="col-4">
+                  <div class="col-6">
                     <select class="custom-select" id="administrationInput" name="administration" required>
                       <option selected disabled value="">Seleziona una via di somministrazione...</option>
                       <option value="Orale">Orale</option>
@@ -176,7 +181,7 @@
 
                 <div class="form-group row">
                   <label class="col-2 col-form-label" for="agentInput">Principio attivo</label>
-                  <div class="col-4">
+                  <div class="input-group col-10">
                     <select class="custom-select" id="agentInput" name="agent" required>
                       <option selected disabled value="">Seleziona un principio attivo...</option>
                       <?php
@@ -189,6 +194,35 @@
                         echo "<option value='{$agent['nome']}'>{$agent['nome']}</option>";
                       ?>
                     </select>
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-success" type="button" data-toggle="modal" data-target="#agentsModal">
+                        <i data-feather="settings"></i>
+                        Gestisci principi attivi
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-2 col-form-label" for="symptomsInput">Sintomi conosciuti</label>
+                  <div class="input-group col-10">
+                    <select class="selectpicker form-control" id="symptomsInput" title="Seleziona uno o più sintomi..." name="symptoms[]" multiple required>
+                      <?php
+                      $query = '
+                        SELECT nome
+                        FROM "SINTOMO"
+                      ';
+                      $result = pg_query($query);
+                      while ($symptom = pg_fetch_array($result, null, PGSQL_ASSOC))
+                        echo "<option value='{$symptom['nome']}'>{$symptom['nome']}</option>";
+                      ?>
+                    </select>
+                    <div class="input-group-append">
+                      <a class="btn btn-outline-success" href="symptoms.php?show">
+                        <i data-feather="database"></i>
+                        Registra nuovo sintomo
+                      </a>
+                    </div>
                   </div>
                 </div>
 
@@ -201,6 +235,144 @@
             </div>
           </div>
         </div>
+
+        <div class="d-flex justify-content-between align-items-baseline">
+          <h4 class="m-3">Lista farmaci registrati</h4>
+          <p class="text-dark">Numero tuple: <?php echo pg_fetch_result(pg_query('SELECT COUNT(*) FROM "FARMACO"'), 0) ?></p>
+        </div>
+
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">Codice</th>
+              <th scope="col">Nome</th>
+              <th scope="col">Forma</th>
+              <th scope="col">Somministrazione</th>
+              <th scope="col">Principio attivo</th>
+              <th scope="col">Sintomi</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php
+            $query = '
+              SELECT *
+              FROM "FARMACO"
+            ';
+            $result = pg_query($query);
+            while ($medicine = pg_fetch_array($result, null, PGSQL_ASSOC)) {
+              echo "
+                <tr>
+                  <th scope='row'>
+                    {$medicine['codice']}
+                  </th>
+                  <td>
+                    {$medicine['nome']}
+                  </td>
+                  <td>
+                    {$medicine['forma']}
+                  </td>
+                  <td>
+                    {$medicine['somministrazione']}
+                  </td>
+                  <td>
+                    {$medicine['principio_attivo']}
+                  </td>
+                  <td>
+                    <button class='btn btn-link text-body pl-0' data-toggle='modal' data-target='#symptomsModal{$medicine['codice']}' type='button'>Visualizza sintomi</button>
+                    <div class='modal fade' id='symptomsModal{$medicine['codice']}'>
+                      <div class='modal-dialog modal-dialog-scrollable'>
+                        <div class='modal-content'>
+                          <div class='modal-header'>
+                            <h5 class='modal-title'>Sintomi {$medicine['nome']} {$medicine['forma']}</h5>
+                            <button type='button' class='close' data-dismiss='modal'>
+                              <span>&times;</span>
+                            </button>
+                          </div>
+                          <div class='modal-body'>
+                            <table class='table table-sm table-borderless table-hover'>
+                              <thead class='thead-light'>
+                                <tr>
+                                  <th scope='col'>#</th>
+                                  <th scope='col'>Sintomi conosciuti</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+              ";
+              $query = "
+                SELECT sintomo
+                FROM \"CAUSA\"
+                WHERE farmaco = {$medicine['codice']} AND conosciuto = true
+              ";
+              $known_sympts = pg_query($query);
+              $count = 0;
+              while ($known_sympt = pg_fetch_array($known_sympts, null, PGSQL_ASSOC)) {
+                $count++;
+                echo "
+                  <tr>
+                    <th scope='row'>
+                      $count
+                    </th>
+                    <td>
+                      {$known_sympt['sintomo']}
+                    </td>
+                  </tr>
+                ";
+              }
+              echo "
+                  </tbody>
+                </table>
+                <table class='table table-sm table-borderless table-hover'>
+                  <thead class='thead-light'>
+                    <tr>
+                      <th scope='col'>#</th>
+                      <th scope='col'>Sintomi sconosciuti</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+              ";
+              $query = "
+                SELECT sintomo
+                FROM \"CAUSA\"
+                WHERE farmaco = {$medicine['codice']} AND conosciuto = false
+              ";
+              $unknown_sympts = pg_query($query);
+              $count = 0;
+              while ($unknown_sympt = pg_fetch_array($unknown_sympts, null, PGSQL_ASSOC)) {
+                $count++;
+                echo "
+                  <tr>
+                    <th scope='row'>
+                      $count
+                    </th>
+                    <td>
+                      {$unknown_sympt['sintomo']}
+                    </td>
+                  </tr>
+                ";
+              }
+              echo "
+                              </tbody>
+                            </table>
+                          </div>
+                          <div class='modal-footer'>
+                            <button type='button' class='btn btn-secondary' data-dismiss='modal'>Chiudi</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class='align-middle text-right'>
+                  <button class='mr-2 btn btn-outline-danger' type='button'>
+                    <i data-feather='trash-2'></i>
+                  </button>
+                  </td>
+                </tr>
+              ";
+            }
+            ?>
+          </tbody>
+        </table>
       </main>
     </div>
   </div>

@@ -33,6 +33,7 @@
         <h2 class="pb-2 pt-3 mb-3 border-bottom">Medici</h2>
 
         <?php include 'includes/handler/error_handler.php' ?>
+        <?php include 'includes/frame/alerts.php' ?>
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/doctors_manager.php' ?>
 
@@ -94,10 +95,10 @@
         <table class="table table-hover">
           <thead>
             <tr>
-              <th scope="col">Codice</th>
+              <th scope="col">ID</th>
               <th scope="col">Nome</th>
-              <th scope="col">Forma</th>
-              <th scope="col">Somministrazione</th>
+              <th scope="col">Cognome</th>
+              <th scope="col">Telefono</th>
               <th scope="col"></th>
             </tr>
           </thead>

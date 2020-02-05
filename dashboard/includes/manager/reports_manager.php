@@ -1,12 +1,4 @@
 <?php
-$succ_alert = "
-  <div class='alert alert-success alert-dismissible fade show' role='alert'>
-    L'operazione è andata a buon fine!
-    <button type='button' class='close' data-dismiss='alert'>
-      <span>&times;</span>
-    </button>
-  </div>
-";
 
 if (isset($_GET['remove']) && !empty($_POST)) {
   $number = $_POST['number'];
@@ -60,6 +52,16 @@ if (isset($_GET['new']) && !empty($_POST)) {
         $query = "
           INSERT INTO \"RIPORTA\"
           VALUES($number, '{$symptom['name']}', '{$symptom['start']}', {$symptom['end']}, '{$symptom['status']}', '{$symptom['severity']}')
+        ";
+        $result = pg_query($query);
+        if (!$result) {
+          pg_query("DELETE FROM \"SEGNALAZIONE\" WHERE numero = $number");
+          break;
+        }
+        $query = "
+          INSERT INTO \"CAUSA\"
+          VALUES({$assumption['medicine']}, '{$symptom['name']}', false)
+          ON CONFLICT DO NOTHING
         ";
         $result = pg_query($query);
         if (!$result) {

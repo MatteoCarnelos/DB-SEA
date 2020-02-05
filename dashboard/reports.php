@@ -36,6 +36,7 @@
         <h2 class="pb-2 pt-3 mb-3 border-bottom">Segnalazioni</h2>
 
         <?php include 'includes/handler/error_handler.php' ?>
+        <?php include 'includes/frame/alerts.php' ?>
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/reports_manager.php' ?>
 
@@ -320,9 +321,9 @@
               if (!isset($report['telefono'])) $report['telefono'] = 'non fornito';
               if (empty($report['note'])) $report['note'] = '-';
               else $report['note'] = "
-                <button class='btn btn-link text-body pl-0' data-toggle='modal' data-target='#notesModal{$report['numero']}' type='button'>Clicca per vedere</button>
+                <button class='btn btn-link text-body pl-0' data-toggle='modal' data-target='#notesModal{$report['numero']}' type='button'>Visualizza note</button>
                 <div class='modal fade' id='notesModal{$report['numero']}'>
-                  <div class='modal-dialog modal-dialog-centered modal-dialog-scrollable'>
+                  <div class='modal-dialog modal-dialog-scrollable'>
                     <div class='modal-content'>
                       <div class='modal-header'>
                         <h5 class='modal-title'>Note segnalazione numero {$report['numero']}</h5>
@@ -438,7 +439,7 @@
                 </tr>
 
                 <div class='modal fade' id='removeModal{$report['numero']}'>
-                  <div class='modal-dialog modal-dialog-centered modal-dialog-scrollable'>
+                  <div class='modal-dialog modal-dialog-scrollable'>
                     <div class='modal-content'>
                       <div class='modal-header'>
                         <h5 class='modal-title'>Rimozione segnalazione numero {$report['numero']}</h5>
@@ -461,7 +462,7 @@
                 </div>
 
                 <div class='modal fade' data-backdrop='static' id='updateModal{$report['numero']}'>
-                  <div class='modal-dialog modal-dialog-centered modal-dialog-scrollable'>
+                  <div class='modal-dialog modal-dialog-scrollable'>
                     <div class='modal-content'>
                       <div class='modal-header'>
                         <h5 class='modal-title'>Aggiornamento segnalazione numero {$report['numero']}</h5>

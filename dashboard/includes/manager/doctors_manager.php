@@ -1,12 +1,4 @@
 <?php
-$succ_alert = '
-  <div class="alert alert-success alert-dismissible fade show" role="alert">
-    Medico aggiunto al database!
-    <button type="button" class="close" data-dismiss="alert">
-      <span>&times;</span>
-    </button>
-  </div>
-';
 
 if (isset($_GET['new']) && !empty($_POST)) {
   $id = $_POST['id'];
