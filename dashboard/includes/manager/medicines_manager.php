@@ -25,6 +25,6 @@ if (isset($_GET['new']) && !empty($_POST)) {
         break;
       }
     }
-    if ($result) echo $succ_alert;
+    if ($result) echo file_get_contents('success_alert.html');
   }
 }

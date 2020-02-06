@@ -33,7 +33,6 @@
         <h2 class="pb-2 pt-3 mb-3 border-bottom">Sintomi</h2>
 
         <?php include 'includes/handler/error_handler.php' ?>
-        <?php include 'includes/frame/alerts.php' ?>
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/symptoms_manager.php' ?>
 
@@ -87,90 +86,110 @@
             </tr>
           </thead>
           <tbody>
+
             <?php
             $query = '
               SELECT *
               FROM "SINTOMO"
             ';
-            $result = pg_query($query);
-            while ($symptom = pg_fetch_array($result, null, PGSQL_ASSOC)) {
-              if (empty($symptom['descrizione'])) $symptom['descrizione'] = '-';
-              $aio_name = str_replace(' ', '_', $symptom['nome']);
-              echo "
-                <tr>
-                  <th scope='row'>
-                    {$symptom['nome']}
-                  </th>
-                  <td>
-                    {$symptom['descrizione']}
-                  </td>
-                  <td>
-              ";
-              $query = "
-                SELECT F.nome, F.forma
-                FROM \"FARMACO\" AS F JOIN \"CAUSA\" AS C ON F.codice = C.farmaco
-                WHERE sintomo = '{$symptom['nome']}'
-              ";
-              $medicines = pg_query($query);
-              if (pg_num_rows($medicines) == 0) echo "<p class='text-muted'>[Nessun farmaco]</p></td>";
-              else {
-                echo "
-                  <button class='btn btn-link text-body pl-0' data-toggle='modal' data-target='#medicinesModal$aio_name' type='button'>Visualizza farmaci</button>
-                  <div class='modal fade' id='medicinesModal{$aio_name}'>
-                    <div class='modal-dialog modal-dialog-scrollable'>
-                      <div class='modal-content'>
-                        <div class='modal-header'>
-                          <h5 class='modal-title'>Farmaci che causano '{$symptom['nome']}'</h5>
-                          <button type='button' class='close' data-dismiss='modal'>
-                            <span>&times;</span>
-                          </button>
-                        </div>
-                        <div class='modal-body'>
-                          <table class='table table-sm table-borderless table-hover'>
-                            <thead class='thead-light'>
-                              <tr>
-                                <th scope='col'>#</th>
-                                <th scope='col'>Farmaco</th>
-                              </tr>
-                            </thead>
-                            <tbody>";
-                $count = 0;
-                while ($medicine = pg_fetch_array($medicines, null, PGSQL_ASSOC)) {
-                  $count++;
-                  echo "
-                    <tr>
-                      <th scope='row'>
-                        $count
-                      </th>
-                      <td>
-                        {$medicine['nome']} {$medicine['forma']}
-                      </td>
-                    </tr>
+            $symptoms = pg_query($query);
+            while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC)) {
+            ?>
+
+              <tr>
+                <th scope="row">
+                  <?php echo $symptom['nome'] ?>
+                </th>
+                <td>
+                  <?php
+                  if (empty($symptom['descrizione'])) echo '<p class="font-italic text-muted">Nessuna descrizione</p>';
+                  else echo $symptom['descrizione'];
+                  ?>
+                </td>
+                <td>
+
+                  <?php
+                  $query = "
+                    SELECT F.nome, F.forma, C.conosciuto
+                    FROM \"FARMACO\" AS F JOIN \"CAUSA\" AS C ON F.codice = C.farmaco
+                    WHERE sintomo = '{$symptom['nome']}'
                   ";
-                }
-                echo "
+                  $medicines = pg_query($query);
+                  if (pg_num_rows($medicines) == 0) {
+                  ?>
+
+                    <p class="font-italic text-muted">Nessun farmaco</p>
+
+                  <?php } else { ?>
+
+                    <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#medicinesModal<?php echo str_replace(' ', '_', $symptom['nome']) ?>" type="button">Visualizza farmaci</button>
+                    <div class="modal fade" id="medicinesModal<?php echo str_replace(' ', '_', $symptom['nome']) ?>">
+                      <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title">Farmaci che causano "<?php echo $symptom['nome'] ?>"</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                              <span>&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            <table class="table table-sm table-borderless table-hover">
+                              <thead class="thead-light">
+                                <tr>
+                                  <th scope="col">#</th>
+                                  <th scope="col">Farmaco</th>
+                                  <th scope="col"></th>
+                                </tr>
+                              </thead>
+                              <tbody>
+
+                                <?php
+                                $count = 0;
+                                while ($medicine = pg_fetch_array($medicines, null, PGSQL_ASSOC)) {
+                                  $count++;
+                                ?>
+
+                                  <tr>
+                                    <th scope="row">
+                                      <?php echo $count ?>
+                                    </th>
+                                    <td>
+                                      <?php echo "{$medicine['nome']} {$medicine['forma']}" ?>
+                                    </td>
+                                    <td>
+                                      <?php if ($medicine['conosciuto'] == 'f') { ?>
+                                        <p class="text-warning mb-0 text-right">
+                                          <i data-feather="alert-triangle" class="mr-1"></i>
+                                          Sintomo sconosciuto
+                                        </p>
+                                      <?php } ?>
+                                    </td>
+                                  </tr>
+
+                                <?php } ?>
+
                               </tbody>
                             </table>
                           </div>
-                          <div class='modal-footer'>
-                            <button type='button' class='btn btn-secondary' data-dismiss='modal'>Chiudi</button>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </td>
-                ";
-              }
-              echo "
-                  <td class='align-middle text-right'>
-                    <button class='mr-2 btn btn-outline-danger' type='button'>
-                      <i data-feather='trash-2'></i>
-                    </button>
-                  </td>
-                </tr>
-              ";
-            }
-            ?>
+
+                  <?php } ?>
+
+                </td>
+                <td class="align-middle text-right">
+                  <button class="mr-2 btn btn-outline-danger" type="button">
+                    <i data-feather="trash-2"></i>
+                  </button>
+                </td>
+              </tr>
+
+            <?php } ?>
+
           </tbody>
         </table>
 

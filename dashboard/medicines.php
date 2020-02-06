@@ -35,7 +35,6 @@
         <h2 class="pb-2 pt-3 mb-3 border-bottom">Farmaci</h2>
 
         <?php include 'includes/handler/error_handler.php' ?>
-        <?php include 'includes/frame/alerts.php' ?>
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/medicines_manager.php' ?>
         <?php include 'includes/manager/agents_manager.php' ?>
@@ -60,35 +59,37 @@
                     </tr>
                   </thead>
                   <tbody>
+
                     <?php
                     $query = '
                       SELECT *
                       FROM "PRINCIPIO_ATTIVO"
                     ';
-                    $result = pg_query($query);
+                    $agents = pg_query($query);
                     $count = 0;
-                    while ($agent = pg_fetch_array($result, null, PGSQL_ASSOC)) {
+                    while ($agent = pg_fetch_array($agents, null, PGSQL_ASSOC)) {
                       $count++;
-                      echo "
-                        <tr>
-                          <form method='post' action='medicines.php?show&removeagent'>
-                            <input type='hidden' name='name' value='{$agent['nome']}'>
-                            <th class='align-middle' scope='row'>
-                              $count
-                            </th>
-                            <td class='align-middle cell-name'>
-                              {$agent['nome']}
-                            </td>
-                            <td class='align-middle text-right'>
-                              <button class='btn btn-outline-danger' type='submit'>
-                                <i data-feather='trash-2'></i>
-                              </button>
-                            </td>
-                          </form>
-                        </tr>
-                      ";
-                    }
                     ?>
+
+                      <tr>
+                        <form method="post" action="medicines.php?show&removeagent">
+                          <input type="hidden" name="name" value="<?php echo $agent['nome'] ?>">
+                          <th class="align-middle" scope="row">
+                            <?php echo $count ?>
+                          </th>
+                          <td class="align-middle cell-name">
+                            <?php echo $agent['nome'] ?>
+                          </td>
+                          <td class="align-middle text-right">
+                            <button class="btn btn-outline-danger" type="submit">
+                              <i data-feather="trash-2"></i>
+                            </button>
+                          </td>
+                        </form>
+                      </tr>
+
+                    <?php } ?>
+
                     <tr>
                       <form method="post" action="medicines.php?show&newagent">
                         <th class="align-middle" scope="row">
@@ -189,8 +190,8 @@
                         SELECT *
                         FROM "PRINCIPIO_ATTIVO"
                       ';
-                      $result = pg_query($query);
-                      while ($agent = pg_fetch_array($result, null, PGSQL_ASSOC))
+                      $agents = pg_query($query);
+                      while ($agent = pg_fetch_array($agents, null, PGSQL_ASSOC))
                         echo "<option value='{$agent['nome']}'>{$agent['nome']}</option>";
                       ?>
                     </select>
@@ -212,8 +213,8 @@
                         SELECT nome
                         FROM "SINTOMO"
                       ';
-                      $result = pg_query($query);
-                      while ($symptom = pg_fetch_array($result, null, PGSQL_ASSOC))
+                      $symptoms = pg_query($query);
+                      while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC))
                         echo "<option value='{$symptom['nome']}'>{$symptom['nome']}</option>";
                       ?>
                     </select>
@@ -254,123 +255,141 @@
             </tr>
           </thead>
           <tbody>
+
             <?php
             $query = '
               SELECT *
               FROM "FARMACO"
             ';
-            $result = pg_query($query);
-            while ($medicine = pg_fetch_array($result, null, PGSQL_ASSOC)) {
-              echo "
-                <tr>
-                  <th scope='row'>
-                    {$medicine['codice']}
-                  </th>
-                  <td>
-                    {$medicine['nome']}
-                  </td>
-                  <td>
-                    {$medicine['forma']}
-                  </td>
-                  <td>
-                    {$medicine['somministrazione']}
-                  </td>
-                  <td>
-                    {$medicine['principio_attivo']}
-                  </td>
-                  <td>
-                    <button class='btn btn-link text-body pl-0' data-toggle='modal' data-target='#symptomsModal{$medicine['codice']}' type='button'>Visualizza sintomi</button>
-                    <div class='modal fade' id='symptomsModal{$medicine['codice']}'>
-                      <div class='modal-dialog modal-dialog-scrollable'>
-                        <div class='modal-content'>
-                          <div class='modal-header'>
-                            <h5 class='modal-title'>Sintomi {$medicine['nome']} {$medicine['forma']}</h5>
-                            <button type='button' class='close' data-dismiss='modal'>
-                              <span>&times;</span>
-                            </button>
-                          </div>
-                          <div class='modal-body'>
-                            <table class='table table-sm table-borderless table-hover'>
-                              <thead class='thead-light'>
+            $medicines = pg_query($query);
+            while ($medicine = pg_fetch_array($medicines, null, PGSQL_ASSOC)) {
+            ?>
+
+              <tr>
+                <th scope='row'>
+                  <?php echo $medicine['codice'] ?>
+                </th>
+                <td>
+                  <?php echo $medicine['nome'] ?>
+                </td>
+                <td>
+                  <?php echo $medicine['forma'] ?>
+                </td>
+                <td>
+                  <?php echo $medicine['somministrazione'] ?>
+                </td>
+                <td>
+                  <?php echo $medicine['principio_attivo'] ?>
+                </td>
+                <td>
+                  <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#symptomsModal<?php echo $medicine['codice'] ?>" type="button">Visualizza sintomi</button>
+                  <div class="modal fade" id="symptomsModal<?php echo $medicine['codice'] ?>">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Sintomi "<?php echo "{$medicine['nome']} {$medicine['forma']}" ?>"</h5>
+                          <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <table class="table table-sm table-borderless table-hover">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Sintomi conosciuti</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+
+                              <?php
+                              $query = "
+                                SELECT sintomo
+                                FROM \"CAUSA\"
+                                WHERE farmaco = {$medicine['codice']} AND conosciuto = true
+                              ";
+                              $known_sympts = pg_query($query);
+                              $count = 0;
+                              while ($known_sympt = pg_fetch_array($known_sympts, null, PGSQL_ASSOC)) {
+                                $count++;
+                              ?>
+
                                 <tr>
-                                  <th scope='col'>#</th>
-                                  <th scope='col'>Sintomi conosciuti</th>
+                                  <th scope="row">
+                                    <?php echo $count ?>
+                                  </th>
+                                  <td>
+                                    <?php echo $known_sympt['sintomo'] ?>
+                                  </td>
                                 </tr>
-                              </thead>
-                              <tbody>
-              ";
-              $query = "
-                SELECT sintomo
-                FROM \"CAUSA\"
-                WHERE farmaco = {$medicine['codice']} AND conosciuto = true
-              ";
-              $known_sympts = pg_query($query);
-              $count = 0;
-              while ($known_sympt = pg_fetch_array($known_sympts, null, PGSQL_ASSOC)) {
-                $count++;
-                echo "
-                  <tr>
-                    <th scope='row'>
-                      $count
-                    </th>
-                    <td>
-                      {$known_sympt['sintomo']}
-                    </td>
-                  </tr>
-                ";
-              }
-              echo "
-                  </tbody>
-                </table>
-                <table class='table table-sm table-borderless table-hover'>
-                  <thead class='thead-light'>
-                    <tr>
-                      <th scope='col'>#</th>
-                      <th scope='col'>Sintomi sconosciuti</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-              ";
-              $query = "
-                SELECT sintomo
-                FROM \"CAUSA\"
-                WHERE farmaco = {$medicine['codice']} AND conosciuto = false
-              ";
-              $unknown_sympts = pg_query($query);
-              $count = 0;
-              while ($unknown_sympt = pg_fetch_array($unknown_sympts, null, PGSQL_ASSOC)) {
-                $count++;
-                echo "
-                  <tr>
-                    <th scope='row'>
-                      $count
-                    </th>
-                    <td>
-                      {$unknown_sympt['sintomo']}
-                    </td>
-                  </tr>
-                ";
-              }
-              echo "
-                              </tbody>
-                            </table>
-                          </div>
-                          <div class='modal-footer'>
-                            <button type='button' class='btn btn-secondary' data-dismiss='modal'>Chiudi</button>
-                          </div>
+
+                              <?php } ?>
+
+                            </tbody>
+                          </table>
+                          <table class="table table-sm table-borderless table-hover">
+                            <thead class="thead-light">
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Sintomi sconosciuti</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+
+                              <?php
+                              $query = "
+                                SELECT sintomo
+                                FROM \"CAUSA\"
+                                WHERE farmaco = {$medicine['codice']} AND conosciuto = false
+                              ";
+                              $unknown_sympts = pg_query($query);
+                              $count = 0;
+                              while ($unknown_sympt = pg_fetch_array($unknown_sympts, null, PGSQL_ASSOC)) {
+                                $count++;
+                              ?>
+
+                                <tr>
+                                  <th scope="row">
+                                    <?php echo $count ?>
+                                  </th>
+                                  <td>
+                                    <?php echo $unknown_sympt['sintomo'] ?>
+                                  </td>
+                                </tr>
+
+                              <?php }
+                              if ($count == 0) { ?>
+
+                                <tr>
+                                  <th scope="row">
+                                    <p class="text-muted">-</p>
+                                  </th>
+                                  <td>
+                                    <p class="font-italic text-muted">Nessun sintomo sconosciuto segnalato</p>
+                                  </td>
+                                </tr>
+
+                              <?php } ?>
+
+                            </tbody>
+                          </table>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
                         </div>
                       </div>
                     </div>
-                  </td>
-                  <td class='align-middle text-right'>
-                  <button class='mr-2 btn btn-outline-danger' type='button'>
-                    <i data-feather='trash-2'></i>
+                  </div>
+                </td>
+                <td class="align-middle text-right">
+                  <button class="mr-2 btn btn-outline-danger" type="button">
+                    <i data-feather="trash-2"></i>
                   </button>
-                  </td>
-                </tr>
-              ";
-            }
-            ?>
+                </td>
+              </tr>
+
+            <?php } ?>
+
           </tbody>
         </table>
       </main>

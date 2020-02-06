@@ -6,7 +6,7 @@ if (isset($_GET['remove']) && !empty($_POST)) {
     DELETE FROM \"SEGNALAZIONE\" WHERE numero = $number
   ";
   $result = pg_query($query);
-  if ($result) echo $succ_alert;
+  if ($result) echo file_get_contents('success_alert.html');
 }
 
 if (isset($_GET['new']) && !empty($_POST)) {
@@ -69,7 +69,7 @@ if (isset($_GET['new']) && !empty($_POST)) {
           break;
         }
       }
-      if ($result) echo $succ_alert;
+      if ($result) echo file_get_contents('success_alert.html');
     }
   }
 }

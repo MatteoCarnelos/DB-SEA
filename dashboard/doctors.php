@@ -33,7 +33,6 @@
         <h2 class="pb-2 pt-3 mb-3 border-bottom">Medici</h2>
 
         <?php include 'includes/handler/error_handler.php' ?>
-        <?php include 'includes/frame/alerts.php' ?>
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/doctors_manager.php' ?>
 
@@ -103,40 +102,44 @@
             </tr>
           </thead>
           <tbody>
+
             <?php
             $query = '
               SELECT *
               FROM "MEDICO"
             ';
-            $result = pg_query($query);
-            while ($doctor = pg_fetch_array($result, null, PGSQL_ASSOC)) {
-              if (!isset($doctor['telefono'])) $doctor['telefono'] = 'Non rilasciato';
-              echo "
-                <tr>
-                  <th scope='row'>
-                    {$doctor['id']}
-                  </th>
-                  <td>
-                    {$doctor['nome']}
-                  </td>
-                  <td>
-                    {$doctor['cognome']}
-                  </td>
-                  <td>
-                    {$doctor['telefono']}
-                  </td>
-                  <td class='align-middle text-right'>
-                    <button class='mr-2 btn btn-outline-danger' type='button'>
-                      <i data-feather='trash-2'></i>
-                    </button>
-                    <button class='btn btn-outline-info' type='button'>
-                      <i data-feather='edit'></i>
-                    </button>
-                  </td>
-                </tr>
-              ";
-            }
+            $doctors = pg_query($query);
+            while ($doctor = pg_fetch_array($doctors, null, PGSQL_ASSOC)) {
             ?>
+
+              <tr>
+                <th scope="row">
+                  <?php echo $doctor['id'] ?>
+                </th>
+                <td>
+                  <?php echo $doctor['nome'] ?>
+                </td>
+                <td>
+                  <?php echo $doctor['cognome'] ?>
+                </td>
+                <td>
+                  <?php
+                  if (!isset($doctor['telefono'])) echo '<p class="font-italic text-muted">Non rilasciato</p>';
+                  else echo $doctor['telefono'];
+                  ?>
+                </td>
+                <td class="align-middle text-right">
+                  <button class="mr-2 btn btn-outline-danger" type="button">
+                    <i data-feather="trash-2"></i>
+                  </button>
+                  <button class="btn btn-outline-info" type="button">
+                    <i data-feather="edit"></i>
+                  </button>
+                </td>
+              </tr>
+
+            <?php } ?>
+
           </tbody>
         </table>
       </main>

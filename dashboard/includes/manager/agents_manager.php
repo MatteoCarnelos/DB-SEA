@@ -7,7 +7,7 @@ if (isset($_GET['newagent']) && !empty($_POST)) {
     VALUES('$name')
   ";
   $result = pg_query($query);
-  if ($result) echo $succ_alert;
+  if ($result) echo file_get_contents('success_alert.html');
 }
 
 if (isset($_GET['removeagent']) && !empty($_POST)) {
@@ -16,5 +16,5 @@ if (isset($_GET['removeagent']) && !empty($_POST)) {
     DELETE FROM \"PRINCIPIO_ATTIVO\" WHERE nome = '$name'
   ";
   $result = pg_query($query);
-  if ($result) echo $succ_alert;
+  if ($result) echo file_get_contents('success_alert.html');
 }

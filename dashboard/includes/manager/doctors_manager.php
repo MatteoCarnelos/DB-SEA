@@ -12,5 +12,5 @@ if (isset($_GET['new']) && !empty($_POST)) {
     VALUES($id, '$name', '$surname', $phone)
   ";
   $result = pg_query($query);
-  if ($result) echo $succ_alert;
+  if ($result) echo file_get_contents('success_alert.html');
 }

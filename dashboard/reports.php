@@ -36,7 +36,6 @@
         <h2 class="pb-2 pt-3 mb-3 border-bottom">Segnalazioni</h2>
 
         <?php include 'includes/handler/error_handler.php' ?>
-        <?php include 'includes/frame/alerts.php' ?>
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/reports_manager.php' ?>
 
@@ -73,8 +72,8 @@
                         SELECT id, nome, cognome
                         FROM "MEDICO"
                       ';
-                      $result = pg_query($query);
-                      while ($doctor = pg_fetch_array($result, null, PGSQL_ASSOC))
+                      $doctors = pg_query($query);
+                      while ($doctor = pg_fetch_array($doctors, null, PGSQL_ASSOC))
                         echo "<option value='{$doctor['id']}'>{$doctor['nome']} {$doctor['cognome']}</option>";
                       ?>
                     </select>
@@ -138,8 +137,8 @@
                         SELECT codice, nome, forma
                         FROM "FARMACO"
                       ';
-                      $result = pg_query($query);
-                      while ($medicine = pg_fetch_array($result, null, PGSQL_ASSOC))
+                      $medicines = pg_query($query);
+                      while ($medicine = pg_fetch_array($medicines, null, PGSQL_ASSOC))
                         echo "<option value='{$medicine['codice']}'>{$medicine['nome']} {$medicine['forma']}</option>";
                       ?>
                     </select>
@@ -210,8 +209,8 @@
                             SELECT nome
                             FROM "SINTOMO"
                           ';
-                          $result = pg_query($query);
-                          while ($symptom = pg_fetch_array($result, null, PGSQL_ASSOC))
+                          $symptoms = pg_query($query);
+                          while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC))
                             echo "<option value='{$symptom['nome']}'>{$symptom['nome']}</option>";
                           ?>
                         </select>
@@ -304,6 +303,7 @@
             </tr>
           </thead>
           <tbody>
+
             <?php
             $query = '
               SELECT S.numero, S.data, S.note, 
@@ -315,176 +315,183 @@
                 JOIN "PAZIENTE" AS P ON S.numero = P.segnalazione
                 JOIN "FARMACO" AS F ON P.farmaco = F.codice
             ';
-            $result1 = pg_query($query);
-            while ($report = pg_fetch_array($result1, null, PGSQL_ASSOC)) {
-              $report['data'] = date('d-m-Y', strtotime($report['data']));
-              if (!isset($report['telefono'])) $report['telefono'] = 'non fornito';
-              if (empty($report['note'])) $report['note'] = '-';
-              else $report['note'] = "
-                <button class='btn btn-link text-body pl-0' data-toggle='modal' data-target='#notesModal{$report['numero']}' type='button'>Visualizza note</button>
-                <div class='modal fade' id='notesModal{$report['numero']}'>
-                  <div class='modal-dialog modal-dialog-scrollable'>
-                    <div class='modal-content'>
-                      <div class='modal-header'>
-                        <h5 class='modal-title'>Note segnalazione numero {$report['numero']}</h5>
-                        <button type='button' class='close' data-dismiss='modal'>
-                          <span>&times;</span>
-                        </button>
-                      </div>
-                      <div class='modal-body'>
-                        {$report['note']}
-                      </div>
-                      <div class='modal-footer'>
-                        <button type='button' class='btn btn-secondary' data-dismiss='modal'>Chiudi</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ";
-              $temp = "";
-              foreach (str_split($report['iniziali']) as $initial)
-                $temp .= "$initial. ";
-              $report['iniziali'] = $temp;
-              $report['sesso'] = $report['sesso'] == 'M' ? 'Maschio' : 'Femmina';
-              if ($report['gravidanza'] == 't') $report['gravidanza'] = ', Gravidanza';
-              else $report['gravidanza'] = '';
+            $reports = pg_query($query);
+            while ($report = pg_fetch_array($reports, null, PGSQL_ASSOC)) {
               $report['inizio'] = date('d-m-Y', strtotime($report['inizio']));
               if (!isset($report['fine'])) $report['fine'] = 'in corso';
               else $report['fine'] = date('d-m-Y', strtotime($report['fine']));
-              echo "
-                <tr>
-                  <th scope='row'>
-                    {$report['numero']}<br>
-                    <p class='text-muted font-weight-normal'>{$report['data']}</p>
-                  </th>
-                  <td>
-                    {$report['nome']} {$report['cognome']}<br>
-                    <p class='text-muted'>tel. {$report['telefono']}</p>
-                  </td>
-                  <td>
-                    {$report['note']}
-                  </td>
-                  <td>
-                    {$report['iniziali']}({$report['sesso']}{$report['gravidanza']})
-                    <p class='text-muted'>Anni {$report['età']}, {$report['città']}</p>
-                  </td>
-                  <td>
-                    {$report['farmaco']}
-                    <p class='text-muted'>
-                      {$report['inizio']} → {$report['fine']}<br>
-                      {$report['frequenza']}, {$report['dosaggio']}<br>
-                    </p>
-                  </td>
-              ";
-
-              $query = "
-                SELECT sintomo, insorgenza, fine, stato, gravità
-                FROM \"RIPORTA\"
-                WHERE segnalazione = {$report['numero']}
-              ";
-              $result = pg_query($query);
-              if (pg_num_rows($result) == 1) {
-                $symptom = pg_fetch_row($result, 0, PGSQL_ASSOC);
-                $symptom['insorgenza'] = date('d-m-Y', strtotime($symptom['insorgenza']));
-                if (!isset($symptom['fine'])) $symptom['fine'] = 'in corso';
-                else $symptom['fine'] = date('d-m-Y', strtotime($symptom['fine']));
-                echo "
-                  <td>
-                    {$symptom['sintomo']}
-                    <p class='text-muted'>
-                      {$symptom['insorgenza']} → {$symptom['fine']}<br>
-                      {$symptom['stato']}, {$symptom['gravità']}<br>
-                    </p>
-                  </td>
-                ";
-              } else {
-                echo "
-                  <td>
-                    <div class='accordion' id='root{$report['numero']}'>
-                ";
-                $count = 0;
-                while ($symptom = pg_fetch_array($result, null, PGSQL_ASSOC)) {
-                  $symptom['insorgenza'] = date('d-m-Y', strtotime($symptom['insorgenza']));
-                  if (!isset($symptom['fine'])) $symptom['fine'] = 'in corso';
-                  else $symptom['fine'] = date('d-m-Y', strtotime($symptom['fine']));
-                  $count++;
-                  echo "
-                    <a class='btn-link text-body' href='#collapse{$report['numero']}$count' data-toggle='collapse'>
-                      + {$symptom['sintomo']}<br>
-                    </a>
-                    <div class='collapse text-muted' id='collapse{$report['numero']}$count' data-parent='#root{$report['numero']}'>
-                      {$symptom['insorgenza']} → {$symptom['fine']}<br>
-                      {$symptom['stato']}, {$symptom['gravità']}
-                    </div>
-                  ";
-                }
-                echo "
-                    </div>
-                  </td>
-                ";
-              }
-              echo "
-                  <td class='align-middle'>
-                    <div class='row justify-content-end mr-1'>
-                      <button class='mb-2 btn btn-outline-danger' type='button' data-toggle='modal' data-target='#removeModal{$report['numero']}'>
-                        <i data-feather='trash-2'></i>
-                      </button>
-                    </div>
-                    <div class='row justify-content-end mr-1'>
-                      <button class='btn btn-outline-info' type='button' data-toggle='modal' data-target='#updateModal{$report['numero']}'>
-                        <i data-feather='edit'></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-
-                <div class='modal fade' id='removeModal{$report['numero']}'>
-                  <div class='modal-dialog modal-dialog-scrollable'>
-                    <div class='modal-content'>
-                      <div class='modal-header'>
-                        <h5 class='modal-title'>Rimozione segnalazione numero {$report['numero']}</h5>
-                        <button type='button' class='close' data-dismiss='modal'>
-                          <span>&times;</span>
-                        </button>
-                      </div>
-                      <form class='needs-validation' method='post' action='reports.php?remove' novalidate>
-                        <input type='hidden' name='number' value='{$report['numero']}'>
-                        <div class='modal-body'>
-                          Sei sicuro di voler cancellare la segnalazione?
-                        </div>
-                        <div class='modal-footer'>
-                          <button type='button' class='btn btn-secondary' data-dismiss='modal'>Annulla</button>
-                          <button type='submit' class='btn btn-danger'>Cancella</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-
-                <div class='modal fade' data-backdrop='static' id='updateModal{$report['numero']}'>
-                  <div class='modal-dialog modal-dialog-scrollable'>
-                    <div class='modal-content'>
-                      <div class='modal-header'>
-                        <h5 class='modal-title'>Aggiornamento segnalazione numero {$report['numero']}</h5>
-                        <button type='button' class='close' data-dismiss='modal'>
-                          <span>&times;</span>
-                        </button>
-                      </div>
-                      <form class='needs-validation' method='post' action='reports.php?update' novalidate>
-                        <div class='modal-body'>
-                          Coming soon...
-                        </div>
-                        <div class='modal-footer'>
-                          <button type='button' class='btn btn-secondary' data-dismiss='modal'>Annulla</button>
-                          <button type='submit' class='btn btn-info'>Salva modifiche</button>
-                        </div>
-                      </form>
-                    </div>
-                  </div>
-                </div>
-              ";
-            }
             ?>
+
+              <tr>
+                <th scope="row">
+                  <?php echo $report['numero'] ?> <br>
+                  <p class="text-muted font-weight-normal"><?php echo date('d-m-Y', strtotime($report['data'])) ?></p>
+                </th>
+                <td>
+                  <?php echo "{$report['nome']} {$report['cognome']}" ?><br>
+                  <p class="text-muted">tel. <?php echo isset($report['telefono']) ? $report['telefono'] : 'non fornito' ?></p>
+                </td>
+                <td>
+                  <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#notesModal<?php echo $report['numero'] ?>" type="button">Visualizza/Modifica note</button>
+                  <div class="modal fade" id="notesModal<?php echo $report['numero'] ?>">
+                    <div class="modal-dialog modal-dialog-scrollable">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title">Note segnalazione numero <?php echo $report['numero'] ?></h5>
+                          <button type="button" class="close" data-dismiss="modal">
+                            <span>&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                          <?php echo $report['note'] ?>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <?php
+                  foreach (str_split($report['iniziali']) as $initial)
+                    echo "$initial. ";
+                  echo '(';
+                  echo $report['sesso'] == 'M' ? 'Maschio' : 'Femmina';
+                  if ($report['gravidanza'] == 't') echo ', Gravidanza';
+                  echo ')<br>';
+                  ?>
+                  <p class="text-muted"><?php echo "Anni {$report['età']}, {$report['città']}" ?></p>
+                </td>
+                <td>
+                  <?php echo $report['farmaco'] ?>
+                  <p class="text-muted">
+                    <?php
+                    echo date('d-m-Y', strtotime($report['inizio']));
+                    echo ' → ';
+                    echo date('d-m-Y', strtotime($report['fine']));
+                    echo '<br>';
+                    echo "{$report['frequenza']}, {$report['dosaggio']}<br>";
+                    ?>
+                  </p>
+                </td>
+
+                <?php
+                $query = "
+                  SELECT sintomo, insorgenza, fine, stato, gravità
+                  FROM \"RIPORTA\"
+                  WHERE segnalazione = {$report['numero']}
+                ";
+                $symptoms = pg_query($query);
+                if (pg_num_rows($symptoms) == 1) {
+                  $symptom = pg_fetch_row($symptoms, 0, PGSQL_ASSOC);
+                ?>
+
+                  <td>
+                    <?php echo $symptom['sintomo'] ?>
+                    <p class="text-muted">
+                      <?php
+                      echo date('d-m-Y', strtotime($symptom['insorgenza']));
+                      echo ' → ';
+                      if (!isset($symptom['fine'])) echo 'in corso';
+                      else echo date('d-m-Y', strtotime($symptom['fine']));
+                      echo '<br>';
+                      echo "{$symptom['stato']}, {$symptom['gravità']}<br>";
+                      ?>
+                    </p>
+                  </td>
+
+                <?php } else { ?>
+
+                  <td>
+                    <div class="accordion" id="root<?php echo $report['numero'] ?>">
+
+                      <?php
+                      $count = 0;
+                      while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC)) {
+                        $count++;
+                      ?>
+
+                        <a class="btn-link text-body" href="#collapse<?php echo $report['numero'] . $count ?>" data-toggle='collapse'>
+                          + <?php echo $symptom['sintomo'] ?><br>
+                        </a>
+                        <div class="collapse text-muted" id="collapse<?php echo $report['numero'] . $count ?>" data-parent="#root<?php echo $report['numero'] ?>">
+                          <?php
+                          echo date('d-m-Y', strtotime($symptom['insorgenza']));
+                          echo ' → ';
+                          if (!isset($symptom['fine'])) echo 'in corso';
+                          else echo date('d-m-Y', strtotime($symptom['fine']));
+                          echo '<br>';
+                          echo "{$symptom['stato']}, {$symptom['gravità']}<br>";
+                          ?>
+                        </div>
+
+                      <?php } ?>
+
+                    </div>
+                  </td>
+
+                <?php } ?>
+
+                <td class="align-middle">
+                  <div class="row justify-content-end mr-1">
+                    <button class="mb-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $report['numero'] ?>">
+                      <i data-feather="trash-2"></i>
+                    </button>
+                  </div>
+                  <div class="row justify-content-end mr-1">
+                    <button class="btn btn-outline-info" type="button" data-toggle="modal" data-target="#updateModal<?php echo $report['numero'] ?>">
+                      <i data-feather="edit"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <div class="modal fade" id="removeModal<?php echo $report['numero'] ?>">
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Rimozione segnalazione numero <?php echo $report['numero'] ?></h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <form class="needs-validation" method="post" action="reports.php?remove" novalidate>
+                      <input type="hidden" name="number" value="<?php echo $report['numero'] ?>">
+                      <div class="modal-body">
+                        Sei sicuro di voler cancellare la segnalazione?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-danger">Cancella</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" data-backdrop="static" id="updateModal<?php echo $report['numero'] ?>">
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Aggiornamento segnalazione numero <?php echo $report['numero'] ?></h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <form class="needs-validation" method="post" action="reports.php?update" novalidate>
+                      <div class="modal-body">
+                        Coming soon...
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-info">Salva modifiche</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            <?php } ?>
           </tbody>
         </table>
       </main>
