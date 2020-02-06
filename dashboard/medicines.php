@@ -160,7 +160,7 @@
                       <option value="Granulato">Granulato</option>
                       <option disabled value="">Semisolide:</option>
                       <option value="Gel">Gel</option>
-                      <option value="Ungente">Ungente</option>
+                      <option value="Unguente">Unguente</option>
                       <option value="Lubrificante">Lubrificante</option>
                       <option value="Pasta">Pasta</option>
                       <option disabled value="">Liquide:</option>
