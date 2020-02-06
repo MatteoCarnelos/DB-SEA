@@ -48,15 +48,15 @@
               <form class="needs-validation" method="post" action="symptoms.php?new" novalidate>
 
                 <div class="form-group row">
-                  <label class="col-1 col-form-label" for="nameInput">Nome</label>
+                  <label class="col-2 col-form-label" for="nameInput">Nome</label>
                   <div class="col-4">
                     <input type="text" class="form-control" id="nameInput" name="name" placeholder="Nome del sintomo..." required>
                   </div>
                 </div>
 
                 <div class="form-group row">
-                  <label class="col-1 col-form-label" for="descriptionInput">Descrizione</label>
-                  <div class="col-11">
+                  <label class="col-2 col-form-label" for="descriptionInput">Descrizione</label>
+                  <div class="col-10">
                     <textarea class="form-control" id="descriptionInput" name="description" rows="3" placeholder="Descrizione del sintomo..."></textarea>
                   </div>
                 </div>
@@ -91,9 +91,11 @@
             $query = '
               SELECT *
               FROM "SINTOMO"
+              ORDER BY nome
             ';
             $symptoms = pg_query($query);
             while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC)) {
+              $namecode = str_replace(' ', '_', $symptom['nome']);
             ?>
 
               <tr>
@@ -113,6 +115,7 @@
                     SELECT F.nome, F.forma, C.conosciuto
                     FROM \"FARMACO\" AS F JOIN \"CAUSA\" AS C ON F.codice = C.farmaco
                     WHERE sintomo = '{$symptom['nome']}'
+                    ORDER BY F.nome, F.forma
                   ";
                   $medicines = pg_query($query);
                   if (pg_num_rows($medicines) == 0) {
@@ -122,8 +125,8 @@
 
                   <?php } else { ?>
 
-                    <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#medicinesModal<?php echo str_replace(' ', '_', $symptom['nome']) ?>" type="button">Visualizza farmaci</button>
-                    <div class="modal fade" id="medicinesModal<?php echo str_replace(' ', '_', $symptom['nome']) ?>">
+                    <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#medicinesModal<?php echo $namecode ?>" type="button">Visualizza farmaci</button>
+                    <div class="modal fade" id="medicinesModal<?php echo $namecode ?>">
                       <div class="modal-dialog modal-dialog-scrollable">
                         <div class="modal-content">
                           <div class="modal-header">
@@ -182,11 +185,34 @@
 
                 </td>
                 <td class="align-middle text-right">
-                  <button class="mr-2 btn btn-outline-danger" type="button">
+                  <button class="mr-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $namecode ?>">
                     <i data-feather="trash-2"></i>
                   </button>
                 </td>
               </tr>
+
+              <div class="modal fade" id="removeModal<?php echo $namecode ?>">
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Rimozione sintomo "<?php echo $symptom['nome'] ?>"</h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <form class="needs-validation" method="post" action="symptoms.php?remove" novalidate>
+                      <input type="hidden" name="name" value="<?php echo $symptom['nome'] ?>">
+                      <div class="modal-body">
+                        Sei sicuro di voler cancellare il sintomo?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-danger">Cancella</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
 
             <?php } ?>
 

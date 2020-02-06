@@ -95,8 +95,8 @@
           <thead>
             <tr>
               <th scope="col">ID</th>
-              <th scope="col">Nome</th>
               <th scope="col">Cognome</th>
+              <th scope="col">Nome</th>
               <th scope="col">Telefono</th>
               <th scope="col"></th>
             </tr>
@@ -107,6 +107,7 @@
             $query = '
               SELECT *
               FROM "MEDICO"
+              ORDER BY cognome, nome
             ';
             $doctors = pg_query($query);
             while ($doctor = pg_fetch_array($doctors, null, PGSQL_ASSOC)) {
@@ -117,10 +118,10 @@
                   <?php echo $doctor['id'] ?>
                 </th>
                 <td>
-                  <?php echo $doctor['nome'] ?>
+                  <?php echo $doctor['cognome'] ?>
                 </td>
                 <td>
-                  <?php echo $doctor['cognome'] ?>
+                  <?php echo $doctor['nome'] ?>
                 </td>
                 <td>
                   <?php
@@ -129,14 +130,68 @@
                   ?>
                 </td>
                 <td class="align-middle text-right">
-                  <button class="mr-2 btn btn-outline-danger" type="button">
+                  <?php if (!isset($doctor['telefono'])) { ?>
+                    <button class="btn btn-outline-info mr-1" type="button" data-toggle="modal" data-target="#addTelModal<?php echo $doctor['id'] ?>">
+                      <i data-feather="phone"></i>
+                      Aggiungi telefono
+                    </button>
+                  <?php } ?>
+                  <button class="btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $doctor['id'] ?>">
                     <i data-feather="trash-2"></i>
-                  </button>
-                  <button class="btn btn-outline-info" type="button">
-                    <i data-feather="edit"></i>
                   </button>
                 </td>
               </tr>
+
+              <div class="modal fade" id="removeModal<?php echo $doctor['id'] ?>">
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Rimozione medico <?php echo "{$doctor['nome']} {$doctor['cognome']}" ?></h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <form class="needs-validation" method="post" action="doctors.php?remove" novalidate>
+                      <input type="hidden" name="id" value="<?php echo $doctor['id'] ?>">
+                      <div class="modal-body">
+                        Sei sicuro di voler cancellare il medico?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-danger">Cancella</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal fade" data-backdrop="static" id="addTelModal<?php echo $doctor['id'] ?>">
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Modifica medico <?php echo "{$doctor['nome']} {$doctor['cognome']}" ?></h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <form method="post" action="doctors.php?update">
+                      <input type="hidden" name="id" value="<?php echo $doctor['id'] ?>">
+                      <div class="modal-body">
+                        <div class="form-group row">
+                          <label class="col-3 col-form-label" for="modPhoneInput">Telefono</label>
+                          <div class="col-9">
+                            <input type="text" class="form-control text-uppercase" id="modPhoneInput" name="phone" placeholder="+393401234567" required>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-info">Aggiungi</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
 
             <?php } ?>
 

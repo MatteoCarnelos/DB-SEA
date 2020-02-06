@@ -1,12 +1,24 @@
 <?php
 
+if (isset($_GET['updatenote']) && !empty($_POST)) {
+  $number = $_POST['number'];
+  $notes = $_POST['notes'];
+  $query = "
+    UPDATE \"SEGNALAZIONE\"
+    SET note = '$notes'
+    WHERE numero = $number
+  ";
+  $result = pg_query($query);
+  if ($result) include 'success_alert.html';
+}
+
 if (isset($_GET['remove']) && !empty($_POST)) {
   $number = $_POST['number'];
   $query = "
     DELETE FROM \"SEGNALAZIONE\" WHERE numero = $number
   ";
   $result = pg_query($query);
-  if ($result) echo file_get_contents('success_alert.html');
+  if ($result) include 'success_alert.html';
 }
 
 if (isset($_GET['new']) && !empty($_POST)) {
@@ -69,7 +81,7 @@ if (isset($_GET['new']) && !empty($_POST)) {
           break;
         }
       }
-      if ($result) echo file_get_contents('success_alert.html');
+      if ($result) include 'success_alert.html';
     }
   }
 }

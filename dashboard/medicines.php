@@ -32,14 +32,20 @@
 
       <!-- Main area -->
       <main role="main" class="col-10 ml-auto px-4">
-        <h2 class="pb-2 pt-3 mb-3 border-bottom">Farmaci</h2>
+        <div class="d-flex justify-content-between align-items-center pt-3 mb-3 border-bottom">
+          <h2>Farmaci</h2>
+          <button class="btn btn-outline-secondary" type="button" data-toggle="modal" data-target="#agentsModal">
+            <i data-feather="settings"></i>
+            Gestisci principi attivi
+          </button>
+        </div>
 
         <?php include 'includes/handler/error_handler.php' ?>
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/medicines_manager.php' ?>
         <?php include 'includes/manager/agents_manager.php' ?>
 
-        <div class="modal fade" id="agentsModal">
+        <div class="modal fade" data-backdrop="static" id="agentsModal">
           <div class="modal-dialog modal-dialog-scrollable">
             <div class="modal-content">
               <div class="modal-header">
@@ -48,7 +54,6 @@
                   <span>&times;</span>
                 </button>
               </div>
-
               <div class="modal-body">
                 <table class="table table-sm table-borderless table-hover">
                   <thead>
@@ -64,6 +69,7 @@
                     $query = '
                       SELECT *
                       FROM "PRINCIPIO_ATTIVO"
+                      ORDER BY nome
                     ';
                     $agents = pg_query($query);
                     $count = 0;
@@ -72,7 +78,7 @@
                     ?>
 
                       <tr>
-                        <form method="post" action="medicines.php?show&removeagent">
+                        <form method="post" action="medicines.php?removeagent">
                           <input type="hidden" name="name" value="<?php echo $agent['nome'] ?>">
                           <th class="align-middle" scope="row">
                             <?php echo $count ?>
@@ -91,7 +97,7 @@
                     <?php } ?>
 
                     <tr>
-                      <form method="post" action="medicines.php?show&newagent">
+                      <form method="post" action="medicines.php?newagent">
                         <th class="align-middle" scope="row">
                           <?php echo $count + 1 ?>
                         </th>
@@ -108,7 +114,6 @@
                   </tbody>
                 </table>
               </div>
-
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
               </div>
@@ -147,19 +152,23 @@
                   <div class="col-6">
                     <select class="custom-select" id="formInput" name="form" required>
                       <option selected disabled value="">Seleziona una forma farmaceutica...</option>
+                      <option disabled value="">Solide:</option>
                       <option value="Compresse">Compresse</option>
                       <option value="Pillole">Pillole</option>
                       <option value="Capsule">Capsule</option>
                       <option value="Polvere">Polvere</option>
                       <option value="Granulato">Granulato</option>
+                      <option disabled value="">Semisolide:</option>
                       <option value="Gel">Gel</option>
                       <option value="Ungente">Ungente</option>
                       <option value="Lubrificante">Lubrificante</option>
                       <option value="Pasta">Pasta</option>
+                      <option disabled value="">Liquide:</option>
                       <option value="Sciroppo">Sciroppo</option>
                       <option value="Fiale">Fiale</option>
                       <option value="Gocce">Gocce</option>
                       <option value="Collirio">Collirio</option>
+                      <option disabled value="">Gassose:</option>
                       <option value="Areosol">Areosol</option>
                     </select>
                   </div>
@@ -172,7 +181,7 @@
                       <option selected disabled value="">Seleziona una via di somministrazione...</option>
                       <option value="Orale">Orale</option>
                       <option value="Topica">Topica</option>
-                      <option value="Parentale">Parentale</option>
+                      <option value="Parenterale">Parenterale</option>
                       <option value="Rettale">Rettale</option>
                       <option value="Oftalmica">Oftalmica</option>
                       <option value="Inalatoria">Inalatoria</option>
@@ -189,6 +198,7 @@
                       $query = '
                         SELECT *
                         FROM "PRINCIPIO_ATTIVO"
+                        ORDER BY nome
                       ';
                       $agents = pg_query($query);
                       while ($agent = pg_fetch_array($agents, null, PGSQL_ASSOC))
@@ -212,6 +222,7 @@
                       $query = '
                         SELECT nome
                         FROM "SINTOMO"
+                        ORDER BY nome
                       ';
                       $symptoms = pg_query($query);
                       while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC))
@@ -260,6 +271,7 @@
             $query = '
               SELECT *
               FROM "FARMACO"
+              ORDER BY nome, forma
             ';
             $medicines = pg_query($query);
             while ($medicine = pg_fetch_array($medicines, null, PGSQL_ASSOC)) {
@@ -307,6 +319,7 @@
                                 SELECT sintomo
                                 FROM \"CAUSA\"
                                 WHERE farmaco = {$medicine['codice']} AND conosciuto = true
+                                ORDER BY sintomo
                               ";
                               $known_sympts = pg_query($query);
                               $count = 0;
@@ -341,6 +354,7 @@
                                 SELECT sintomo
                                 FROM \"CAUSA\"
                                 WHERE farmaco = {$medicine['codice']} AND conosciuto = false
+                                ORDER BY sintomo
                               ";
                               $unknown_sympts = pg_query($query);
                               $count = 0;
@@ -362,10 +376,10 @@
 
                                 <tr>
                                   <th scope="row">
-                                    <p class="text-muted">-</p>
+                                    <p class="text-muted mb-0">-</p>
                                   </th>
                                   <td>
-                                    <p class="font-italic text-muted">Nessun sintomo sconosciuto segnalato</p>
+                                    <p class="font-italic text-muted mb-0">Nessun sintomo sconosciuto segnalato</p>
                                   </td>
                                 </tr>
 
@@ -382,11 +396,34 @@
                   </div>
                 </td>
                 <td class="align-middle text-right">
-                  <button class="mr-2 btn btn-outline-danger" type="button">
+                  <button class="mr-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $medicine['codice'] ?>">
                     <i data-feather="trash-2"></i>
                   </button>
                 </td>
               </tr>
+
+              <div class="modal fade" id="removeModal<?php echo $medicine['codice'] ?>">
+                <div class="modal-dialog modal-dialog-scrollable">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h5 class="modal-title">Rimozione farmaco "<?php echo "{$medicine['nome']} {$medicine['forma']}" ?>"</h5>
+                      <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                      </button>
+                    </div>
+                    <form class="needs-validation" method="post" action="medicines.php?remove" novalidate>
+                      <input type="hidden" name="code" value="<?php echo $medicine['codice'] ?>">
+                      <div class="modal-body">
+                        Sei sicuro di voler cancellare il farmaco?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                        <button type="submit" class="btn btn-danger">Cancella</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
 
             <?php } ?>
 
@@ -398,6 +435,15 @@
 
   <script>
     feather.replace();
+
+    $('#agentsModal').on('shown.bs.modal', function(e) {
+      if ($('#newDoctorCollapse').hasClass('show')) {
+        $(this).find('form').attr('action', function(index, attr) {
+          return attr + "&show";
+        });
+      }
+    });
+
     (function() {
       'use strict';
       window.addEventListener('load', function() {

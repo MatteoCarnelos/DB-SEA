@@ -1,5 +1,14 @@
 <?php
 
+if (isset($_GET['remove']) && !empty($_POST)) {
+  $code = $_POST['code'];
+  $query = "
+    DELETE FROM \"FARMACO\" WHERE codice = $code
+  ";
+  $result = pg_query($query);
+  if ($result) include 'success_alert.html';
+}
+
 if (isset($_GET['new']) && !empty($_POST)) {
   $code = $_POST['code'];
   $name = $_POST['name'];
@@ -25,6 +34,6 @@ if (isset($_GET['new']) && !empty($_POST)) {
         break;
       }
     }
-    if ($result) echo file_get_contents('success_alert.html');
+    if ($result) include 'success_alert.html';
   }
 }

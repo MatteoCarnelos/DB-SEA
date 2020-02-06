@@ -314,12 +314,10 @@
                 JOIN "MEDICO" AS M ON S.medico = M.id
                 JOIN "PAZIENTE" AS P ON S.numero = P.segnalazione
                 JOIN "FARMACO" AS F ON P.farmaco = F.codice
+              ORDER BY S.numero
             ';
             $reports = pg_query($query);
             while ($report = pg_fetch_array($reports, null, PGSQL_ASSOC)) {
-              $report['inizio'] = date('d-m-Y', strtotime($report['inizio']));
-              if (!isset($report['fine'])) $report['fine'] = 'in corso';
-              else $report['fine'] = date('d-m-Y', strtotime($report['fine']));
             ?>
 
               <tr>
@@ -332,8 +330,13 @@
                   <p class="text-muted">tel. <?php echo isset($report['telefono']) ? $report['telefono'] : 'non fornito' ?></p>
                 </td>
                 <td>
-                  <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#notesModal<?php echo $report['numero'] ?>" type="button">Visualizza/Modifica note</button>
-                  <div class="modal fade" id="notesModal<?php echo $report['numero'] ?>">
+                  <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#notesModal<?php echo $report['numero'] ?>" type="button">
+                    <?php
+                    if (empty($report['note'])) echo 'Aggiungi note';
+                    else echo 'Visualizza/Modifica note';
+                    ?>
+                  </button>
+                  <div class="modal fade" data-backdrop="static" id="notesModal<?php echo $report['numero'] ?>">
                     <div class="modal-dialog modal-dialog-scrollable">
                       <div class="modal-content">
                         <div class="modal-header">
@@ -342,12 +345,16 @@
                             <span>&times;</span>
                           </button>
                         </div>
-                        <div class="modal-body">
-                          <?php echo $report['note'] ?>
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
-                        </div>
+                        <form method="post" action="reports.php?updatenote">
+                          <input type="hidden" name="number" value="<?php echo $report['numero'] ?>">
+                          <div class="modal-body">
+                            <textarea class="form-control" name="notes" rows="7" placeholder="Aggiungi note alla segnalazione..."><?php echo $report['note'] ?></textarea>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                            <button type="submit" class="btn btn-info">Salva modifiche</button>
+                          </div>
+                        </form>
                       </div>
                     </div>
                   </div>
@@ -369,7 +376,8 @@
                     <?php
                     echo date('d-m-Y', strtotime($report['inizio']));
                     echo ' → ';
-                    echo date('d-m-Y', strtotime($report['fine']));
+                    if (!isset($report['fine'])) echo 'in corso';
+                    else echo date('d-m-Y', strtotime($report['fine']));
                     echo '<br>';
                     echo "{$report['frequenza']}, {$report['dosaggio']}<br>";
                     ?>
