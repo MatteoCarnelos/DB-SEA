@@ -8,5 +8,5 @@ $err_alert = '
   </div>
 ';
 
-$dbconn = pg_connect("dbname=carnelosma user=webdb password=webdb")
+$dbconn = pg_connect("dbname=SEA user=postgres password=matteosql")
   or die($err_alert);
