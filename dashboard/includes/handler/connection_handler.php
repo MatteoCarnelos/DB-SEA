@@ -6,5 +6,5 @@ $err_alert = '
   </div>
 ';
 
-$dbconn = pg_connect("host=dbstud.dei.unipd.it dbname=carnelosma user=carnelosma password=Mat.Uni2019")
+$dbconn = pg_connect("host=dbstud.dei.unipd.it port=5432 dbname=carnelosma user=carnelosma password=Mat.Uni2019")
   or die($err_alert);
