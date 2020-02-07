@@ -109,7 +109,7 @@
                 <div class="form-group row">
                   <label class="col-1 col-form-label" for="ageInput">Età</label>
                   <div class="col-2">
-                    <input type="number" value="" max="150" class="form-control" id="ageInput" name="patient[age]" placeholder="50" required>
+                    <input type="number" value="" max="150" class="form-control" id="ageInput" name="patient[age]" required>
                   </div>
                   <label class="offset-1 col-1 col-form-label" for="genderInput">Sesso</label>
                   <div class="col-3">
