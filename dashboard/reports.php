@@ -330,7 +330,7 @@
                   <p class="text-muted">tel. <?php echo isset($report['telefono']) ? $report['telefono'] : 'non fornito' ?></p>
                 </td>
                 <td>
-                  <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#notesModal<?php echo $report['numero'] ?>" type="button">
+                  <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#notesModal<?php echo $report['numero'] ?>" type="button">
                     <?php
                     if (empty($report['note'])) echo 'Aggiungi note';
                     else echo 'Visualizza/Modifica note';

@@ -294,7 +294,7 @@
                   <?php echo $medicine['principio_attivo'] ?>
                 </td>
                 <td>
-                  <button class="btn btn-link text-body pl-0" data-toggle="modal" data-target="#symptomsModal<?php echo $medicine['codice'] ?>" type="button">Visualizza sintomi</button>
+                  <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#symptomsModal<?php echo $medicine['codice'] ?>" type="button">Visualizza sintomi</button>
                   <div class="modal fade" id="symptomsModal<?php echo $medicine['codice'] ?>">
                     <div class="modal-dialog modal-dialog-scrollable">
                       <div class="modal-content">
