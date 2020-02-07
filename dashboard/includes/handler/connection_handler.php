@@ -6,5 +6,5 @@ $err_alert = '
   </div>
 ';
 
-$dbconn = pg_connect("host=localhost dbname=SEA user=postgres password=matteosql")
+$dbconn = pg_connect("host=localhost dbname=carnelosma user=carnelosma password=Mat.Uni2019")
   or die($err_alert);
