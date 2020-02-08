@@ -317,7 +317,14 @@
               ORDER BY S.numero
             ';
             $reports = pg_query($query);
+            pg_prepare('selsyms', '
+              SELECT sintomo, insorgenza, fine, stato, gravità
+              FROM "RIPORTA"
+              WHERE segnalazione = $1
+            ');
+            $index = 0;
             while ($report = pg_fetch_array($reports, null, PGSQL_ASSOC)) {
+              $index++;
             ?>
 
               <tr>
@@ -330,13 +337,13 @@
                   <p class="text-muted">tel. <?php echo isset($report['telefono']) ? $report['telefono'] : 'non fornito' ?></p>
                 </td>
                 <td>
-                  <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#notesModal<?php echo $report['numero'] ?>" type="button">
+                  <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#notesModal<?php echo $index ?>" type="button">
                     <?php
                     if (empty($report['note'])) echo 'Aggiungi note';
                     else echo 'Visualizza/Modifica note';
                     ?>
                   </button>
-                  <div class="modal fade" data-backdrop="static" id="notesModal<?php echo $report['numero'] ?>">
+                  <div class="modal fade" data-backdrop="static" id="notesModal<?php echo $index ?>">
                     <div class="modal-dialog modal-dialog-scrollable">
                       <div class="modal-content">
                         <div class="modal-header">
@@ -385,12 +392,7 @@
                 </td>
 
                 <?php
-                $query = "
-                  SELECT sintomo, insorgenza, fine, stato, gravità
-                  FROM \"RIPORTA\"
-                  WHERE segnalazione = {$report['numero']}
-                ";
-                $symptoms = pg_query($query);
+                $symptoms = pg_execute('selsyms', array($report['numero']));
                 if (pg_num_rows($symptoms) == 1) {
                   $symptom = pg_fetch_row($symptoms, 0, PGSQL_ASSOC);
                 ?>
@@ -412,7 +414,7 @@
                 <?php } else { ?>
 
                   <td>
-                    <div class="accordion" id="root<?php echo $report['numero'] ?>">
+                    <div class="accordion" id="root<?php echo $index ?>">
 
                       <?php
                       $count = 0;
@@ -420,10 +422,10 @@
                         $count++;
                       ?>
 
-                        <a class="btn-link text-body" href="#collapse<?php echo $report['numero'] . $count ?>" data-toggle='collapse'>
+                        <a class="btn-link text-body" href="#collapse<?php echo $index . $count ?>" data-toggle='collapse'>
                           + <?php echo $symptom['sintomo'] ?><br>
                         </a>
-                        <div class="collapse text-muted" id="collapse<?php echo $report['numero'] . $count ?>" data-parent="#root<?php echo $report['numero'] ?>">
+                        <div class="collapse text-muted" id="collapse<?php echo $index . $count ?>" data-parent="#root<?php echo $index ?>">
                           <?php
                           echo date('d-m-Y', strtotime($symptom['insorgenza']));
                           echo ' → ';
@@ -443,19 +445,19 @@
 
                 <td class="align-middle">
                   <div class="row justify-content-end mr-1">
-                    <button class="mb-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $report['numero'] ?>">
+                    <button class="mb-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $index ?>">
                       <i data-feather="trash-2"></i>
                     </button>
                   </div>
                   <div class="row justify-content-end mr-1">
-                    <button class="btn btn-outline-info" type="button" data-toggle="modal" data-target="#updateModal<?php echo $report['numero'] ?>">
+                    <button class="btn btn-outline-info" type="button" data-toggle="modal" data-target="#updateModal<?php echo $index ?>">
                       <i data-feather="edit"></i>
                     </button>
                   </div>
                 </td>
               </tr>
 
-              <div class="modal fade" id="removeModal<?php echo $report['numero'] ?>">
+              <div class="modal fade" id="removeModal<?php echo $index ?>">
                 <div class="modal-dialog modal-dialog-scrollable">
                   <div class="modal-content">
                     <div class="modal-header">
@@ -478,7 +480,7 @@
                 </div>
               </div>
 
-              <div class="modal fade" data-backdrop="static" id="updateModal<?php echo $report['numero'] ?>">
+              <div class="modal fade" data-backdrop="static" id="updateModal<?php echo $index ?>">
                 <div class="modal-dialog modal-dialog-scrollable">
                   <div class="modal-content">
                     <div class="modal-header">

@@ -110,7 +110,9 @@
               ORDER BY cognome, nome
             ';
             $doctors = pg_query($query);
+            $index = 0;
             while ($doctor = pg_fetch_array($doctors, null, PGSQL_ASSOC)) {
+              $index++;
             ?>
 
               <tr>
@@ -131,18 +133,18 @@
                 </td>
                 <td class="align-middle text-right">
                   <?php if (!isset($doctor['telefono'])) { ?>
-                    <button class="btn btn-outline-info mr-1" type="button" data-toggle="modal" data-target="#addTelModal<?php echo $doctor['id'] ?>">
+                    <button class="btn btn-outline-info mr-1" type="button" data-toggle="modal" data-target="#addTelModal<?php echo $index ?>">
                       <i data-feather="phone"></i>
                       Aggiungi telefono
                     </button>
                   <?php } ?>
-                  <button class="btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $doctor['id'] ?>">
+                  <button class="btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $index ?>">
                     <i data-feather="trash-2"></i>
                   </button>
                 </td>
               </tr>
 
-              <div class="modal fade" id="removeModal<?php echo $doctor['id'] ?>">
+              <div class="modal fade" id="removeModal<?php echo $index ?>">
                 <div class="modal-dialog modal-dialog-scrollable">
                   <div class="modal-content">
                     <div class="modal-header">
@@ -165,7 +167,7 @@
                 </div>
               </div>
 
-              <div class="modal fade" data-backdrop="static" id="addTelModal<?php echo $doctor['id'] ?>">
+              <div class="modal fade" data-backdrop="static" id="addTelModal<?php echo $index ?>">
                 <div class="modal-dialog modal-dialog-scrollable">
                   <div class="modal-content">
                     <div class="modal-header">

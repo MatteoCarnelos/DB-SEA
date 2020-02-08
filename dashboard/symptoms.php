@@ -94,8 +94,15 @@
               ORDER BY nome
             ';
             $symptoms = pg_query($query);
+            pg_prepare('selmeds', '
+              SELECT F.nome, F.forma, C.conosciuto
+              FROM "FARMACO" AS F JOIN "CAUSA" AS C ON F.codice = C.farmaco
+              WHERE sintomo = $1
+              ORDER BY F.nome, F.forma
+            ');
+            $index = 0;
             while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC)) {
-              $namecode = str_replace(' ', '_', $symptom['nome']);
+              $index++;
             ?>
 
               <tr>
@@ -111,13 +118,7 @@
                 <td>
 
                   <?php
-                  $query = "
-                    SELECT F.nome, F.forma, C.conosciuto
-                    FROM \"FARMACO\" AS F JOIN \"CAUSA\" AS C ON F.codice = C.farmaco
-                    WHERE sintomo = '{$symptom['nome']}'
-                    ORDER BY F.nome, F.forma
-                  ";
-                  $medicines = pg_query($query);
+                  $medicines = pg_execute('selmeds', array($symptom['nome']));
                   if (pg_num_rows($medicines) == 0) {
                   ?>
 
@@ -125,8 +126,8 @@
 
                   <?php } else { ?>
 
-                    <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#medicinesModal<?php echo $namecode ?>" type="button">Visualizza farmaci</button>
-                    <div class="modal fade" id="medicinesModal<?php echo $namecode ?>">
+                    <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#medicinesModal<?php echo $index ?>" type="button">Visualizza farmaci</button>
+                    <div class="modal fade" id="medicinesModal<?php echo $index ?>">
                       <div class="modal-dialog modal-dialog-scrollable">
                         <div class="modal-content">
                           <div class="modal-header">
@@ -185,13 +186,13 @@
 
                 </td>
                 <td class="align-middle text-right">
-                  <button class="mr-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $namecode ?>">
+                  <button class="mr-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $index ?>">
                     <i data-feather="trash-2"></i>
                   </button>
                 </td>
               </tr>
 
-              <div class="modal fade" id="removeModal<?php echo $namecode ?>">
+              <div class="modal fade" id="removeModal<?php echo $index ?>">
                 <div class="modal-dialog modal-dialog-scrollable">
                   <div class="modal-content">
                     <div class="modal-header">

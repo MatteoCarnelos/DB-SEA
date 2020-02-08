@@ -1,11 +1,16 @@
 <?php
 
+function delete_medicine($code)
+{
+  pg_prepare('', '
+    DELETE FROM "FARMACO" WHERE codice = $1
+  ');
+  return pg_execute('', array($code));
+}
+
 if (isset($_GET['remove']) && !empty($_POST)) {
   $code = $_POST['code'];
-  $query = "
-    DELETE FROM \"FARMACO\" WHERE codice = $code
-  ";
-  $result = pg_query($query);
+  $result = delete_medicine($code);
   if ($result) include 'success_alert.html';
 }
 
@@ -17,20 +22,20 @@ if (isset($_GET['new']) && !empty($_POST)) {
   $agent = $_POST['agent'];
   $symptoms = $_POST['symptoms'];
 
-  $query = "
-    INSERT INTO \"FARMACO\"
-    VALUES($code, '$name', '$form', '$administration', '$agent')
-  ";
-  $result = pg_query($query);
+  pg_prepare('', '
+    INSERT INTO "FARMACO"
+    VALUES($1, $2, $3, $4, $5)
+  ');
+  $result = pg_execute('', array($code, $name, $form, $administration, $agent));
   if ($result) {
     foreach ($symptoms as $symptom) {
-      $query = "
-        INSERT INTO \"CAUSA\"
-        VALUES($code, '$symptom', true)
-      ";
-      $result = pg_query($query);
+      pg_prepare('', '
+        INSERT INTO "CAUSA"
+        VALUES($1, $2, true)
+      ');
+      $result = pg_execute('', array($code, $symptom));
       if (!$result) {
-        pg_query("DELETE FROM \"FARMACO\" WHERE codice = $code");
+        delete_medicine($code);
         break;
       }
     }

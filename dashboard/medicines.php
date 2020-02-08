@@ -274,7 +274,15 @@
               ORDER BY nome, forma
             ';
             $medicines = pg_query($query);
+            pg_prepare('selsym', '
+              SELECT sintomo
+              FROM "CAUSA"
+              WHERE farmaco = $1 AND conosciuto = $2
+              ORDER BY sintomo
+            ');
+            $index = 0;
             while ($medicine = pg_fetch_array($medicines, null, PGSQL_ASSOC)) {
+              $index++;
             ?>
 
               <tr>
@@ -294,8 +302,8 @@
                   <?php echo $medicine['principio_attivo'] ?>
                 </td>
                 <td>
-                  <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#symptomsModal<?php echo $medicine['codice'] ?>" type="button">Visualizza sintomi</button>
-                  <div class="modal fade" id="symptomsModal<?php echo $medicine['codice'] ?>">
+                  <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#symptomsModal<?php echo $index ?>" type="button">Visualizza sintomi</button>
+                  <div class="modal fade" id="symptomsModal<?php echo $index ?>">
                     <div class="modal-dialog modal-dialog-scrollable">
                       <div class="modal-content">
                         <div class="modal-header">
@@ -315,13 +323,7 @@
                             <tbody>
 
                               <?php
-                              $query = "
-                                SELECT sintomo
-                                FROM \"CAUSA\"
-                                WHERE farmaco = {$medicine['codice']} AND conosciuto = true
-                                ORDER BY sintomo
-                              ";
-                              $known_sympts = pg_query($query);
+                              $known_sympts = pg_execute('selsym', array($medicine['codice'], 'true'));
                               $count = 0;
                               while ($known_sympt = pg_fetch_array($known_sympts, null, PGSQL_ASSOC)) {
                                 $count++;
@@ -350,13 +352,7 @@
                             <tbody>
 
                               <?php
-                              $query = "
-                                SELECT sintomo
-                                FROM \"CAUSA\"
-                                WHERE farmaco = {$medicine['codice']} AND conosciuto = false
-                                ORDER BY sintomo
-                              ";
-                              $unknown_sympts = pg_query($query);
+                              $unknown_sympts = pg_execute('selsym', array($medicine['codice'], 'false'));
                               $count = 0;
                               while ($unknown_sympt = pg_fetch_array($unknown_sympts, null, PGSQL_ASSOC)) {
                                 $count++;
@@ -396,13 +392,13 @@
                   </div>
                 </td>
                 <td class="align-middle text-right">
-                  <button class="mr-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $medicine['codice'] ?>">
+                  <button class="mr-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $index ?>">
                     <i data-feather="trash-2"></i>
                   </button>
                 </td>
               </tr>
 
-              <div class="modal fade" id="removeModal<?php echo $medicine['codice'] ?>">
+              <div class="modal fade" id="removeModal<?php echo $index ?>">
                 <div class="modal-dialog modal-dialog-scrollable">
                   <div class="modal-content">
                     <div class="modal-header">
