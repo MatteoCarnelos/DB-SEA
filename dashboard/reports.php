@@ -197,12 +197,12 @@
                   </div>
                 </div>
 
-                <div id="symptomsContainer">
+                <div class="symptoms-container" id="symptomsContainer">
                   <div class="symptom-group">
                     <div class="mt-3 form-group row">
                       <label class="col-1 col-form-label" for="symptomInput0">Sintomo</label>
                       <div class="input-group col-11">
-                        <select class="custom-select" id="symptomInput0" name="symptoms[0][name]" required>
+                        <select class="custom-select symptom-select" id="symptomInput0" name="symptoms[0][name]" required>
                           <option selected disabled value="">Seleziona un sintomo...</option>
                           <?php
                           $query = '
@@ -250,25 +250,14 @@
                       <div class="col-3">
                         <select class="custom-select status-select" id="statusInput0" name="symptoms[0][status]" required>
                           <option selected disabled value="">Seleziona uno stato...</option>
-                          <option value="Decesso">Decesso</option>
-                          <option value="Peggiorato">Peggiorato</option>
-                          <option value="Migliorato">Migliorato</option>
-                          <option value="Guarito">Guarito</option>
-                          <option value="Non noto">Non noto</option>
+                          <?php include 'includes/frame/status_options.php' ?>
                         </select>
                       </div>
                       <label class="col-1 col-form-label" for="severityInput0">Gravità</label>
                       <div class="col-3">
                         <select class="custom-select severity-select" id="severityInput0" name="symptoms[0][severity]" required>
                           <option selected disabled value="">Seleziona una gravità...</option>
-                          <option value="Fatale">Fatale</option>
-                          <option value="Pericolo di vita">Pericolo di vita</option>
-                          <option value="Anomalie congenite">Anomalie congenite</option>
-                          <option value="Disabilità">Disabilità</option>
-                          <option value="Ospedalizzazione">Ospedalizzazione</option>
-                          <option value="Clinicamente grave">Clinicamente grave</option>
-                          <option value="Non grave">Non grave</option>
-                          <option value="Non definita">Non definita</option>
+                          <?php include 'includes/frame/severity_options.php' ?>
                         </select>
                       </div>
                     </div>
@@ -393,6 +382,7 @@
 
                 <?php
                 $symptoms = pg_execute('selsyms', array($report['numero']));
+                $updatable = false;
                 if (pg_num_rows($symptoms) == 1) {
                   $symptom = pg_fetch_row($symptoms, 0, PGSQL_ASSOC);
                 ?>
@@ -403,8 +393,10 @@
                       <?php
                       echo date('d-m-Y', strtotime($symptom['insorgenza']));
                       echo ' → ';
-                      if (!isset($symptom['fine'])) echo 'in corso';
-                      else echo date('d-m-Y', strtotime($symptom['fine']));
+                      if (!isset($symptom['fine'])) {
+                        echo 'in corso';
+                        $updatable = true;
+                      } else echo date('d-m-Y', strtotime($symptom['fine']));
                       echo '<br>';
                       echo "{$symptom['stato']}, {$symptom['gravità']}<br>";
                       ?>
@@ -429,8 +421,10 @@
                           <?php
                           echo date('d-m-Y', strtotime($symptom['insorgenza']));
                           echo ' → ';
-                          if (!isset($symptom['fine'])) echo 'in corso';
-                          else echo date('d-m-Y', strtotime($symptom['fine']));
+                          if (!isset($symptom['fine'])) {
+                            echo 'in corso';
+                            $updatable = true;
+                          } else echo date('d-m-Y', strtotime($symptom['fine']));
                           echo '<br>';
                           echo "{$symptom['stato']}, {$symptom['gravità']}<br>";
                           ?>
@@ -445,15 +439,17 @@
 
                 <td class="align-middle">
                   <div class="row justify-content-end mr-1">
-                    <button class="mb-2 btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $index ?>">
+                    <button class="btn btn-outline-danger" type="button" data-toggle="modal" data-target="#removeModal<?php echo $index ?>">
                       <i data-feather="trash-2"></i>
                     </button>
                   </div>
-                  <div class="row justify-content-end mr-1">
-                    <button class="btn btn-outline-info" type="button" data-toggle="modal" data-target="#updateModal<?php echo $index ?>">
-                      <i data-feather="edit"></i>
-                    </button>
-                  </div>
+                  <?php if ($updatable) { ?>
+                    <div class="row justify-content-end mr-1">
+                      <button class="mt-2 btn btn-outline-info" type="button" data-toggle="modal" data-target="#updateModal<?php echo $index ?>">
+                        <i data-feather="edit"></i>
+                      </button>
+                    </div>
+                  <?php } ?>
                 </td>
               </tr>
 
@@ -480,33 +476,86 @@
                 </div>
               </div>
 
-              <div class="modal fade" data-backdrop="static" id="updateModal<?php echo $index ?>">
-                <div class="modal-dialog modal-dialog-scrollable">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h5 class="modal-title">Aggiornamento segnalazione numero <?php echo $report['numero'] ?></h5>
-                      <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                      </button>
-                    </div>
-                    <form class="needs-validation" method="post" action="reports.php?update" novalidate>
-                      <div class="modal-body">
-                        Coming soon...
-                        <?php
-                        //$symptom = pg_fetch_array($symptoms);
-                        //print_r($symptom);
-                        ?>
+              <?php if ($updatable) { ?>
+                <div class="modal fade" data-backdrop="static" id="updateModal<?php echo $index ?>">
+                  <div class="modal-dialog modal-dialog-scrollable">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">Aggiornamento sintomi segnalazione <?php echo $report['numero'] ?></h5>
+                        <button type="button" class="close" data-dismiss="modal">
+                          <span>&times;</span>
+                        </button>
+                      </div>
+                      <form method="post" action="reports.php?update">
+                        <input type="hidden" name="number" value="<?php echo $report['numero'] ?>">
+                        <div class="modal-body">
+                          <div class="symptoms-container">
+                            <?php
+                            $symptoms = pg_execute('selsyms', array($report['numero']));
+                            $count = -1;
+                            while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC)) {
+                              if (!isset($symptom['fine'])) {
+                                $count++;
+                            ?>
 
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
-                        <button type="submit" class="btn btn-info">Salva modifiche</button>
-                      </div>
-                    </form>
+                                <h5 class="border-bottom pb-1"><?php echo $symptom['sintomo'] ?></h5>
+                                <input type="hidden" name="symptoms[<?php echo $count ?>][name]" value="<?php echo $symptom['sintomo'] ?>">
+                                <div class="symptom-group">
+                                  <div class="mt-3 form-group row">
+                                    <label class="col-3 col-form-label" for="modEndSymInput<?php echo $count ?>">Data fine</label>
+                                    <div class="input-group col-7">
+                                      <input type="text" class="form-control datepicker endpicker" data-date-clear-btn="true" id="modEndSymInput<?php echo $count ?>" name="symptoms[<?php echo $count ?>][end]" placeholder="In corso" data-date-start-date="<?php echo date('d-m-Y', strtotime($symptom['insorgenza'])) ?>">
+                                      <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary datepicker-toggler" type="button">
+                                          <i data-feather="calendar"></i>
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="modStatusInput<?php echo $count ?>">Stato</label>
+                                    <div class="col-9">
+                                      <select class="custom-select status-select" id="modStatusInput<?php echo $count ?>" name="symptoms[<?php echo $count ?>][status]" required>
+                                        <option selected disabled value="">Seleziona uno stato...</option>
+                                        <?php
+                                        $selected = $symptom['stato'];
+                                        include 'includes/frame/status_options.php'
+                                        ?>
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <div class="form-group row">
+                                    <label class="col-3 col-form-label" for="modSeverityInput<?php echo $count ?>">Gravità</label>
+                                    <div class="col-9">
+                                      <select class="custom-select severity-select" id="modSeverityInput<?php echo $count ?>" name="symptoms[<?php echo $count ?>][severity]" required>
+                                        <option selected disabled value="">Seleziona una gravità...</option>
+                                        <?php
+                                        $selected = $symptom['gravità'];
+                                        include 'includes/frame/severity_options.php'
+                                        ?>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
+
+                            <?php }
+                            } ?>
+                          </div>
+                        </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                          <button type="submit" class="btn btn-info">Salva modifiche</button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 </div>
-              </div>
+
+              <?php } ?>
             <?php } ?>
+
           </tbody>
         </table>
       </main>
@@ -536,7 +585,7 @@
     }
 
     function loadSymChecks() {
-      $('#symptomsContainer').find('.endpicker').change(function() {
+      $('.symptoms-container').find('.endpicker').change(function() {
         var statusSelect = $(this).closest('.symptom-group').find('.status-select');
         var severitySelect = $(this).closest('.symptom-group').find('.severity-select');
         if ($(this).val() != '') {
@@ -564,6 +613,15 @@
         if ($(this).val() == 'Fatale') statusSelect.val('Decesso');
         else if (statusSelect.val() == 'Decesso') statusSelect.val('');
       });
+      $('.symptom-select').change(function() {
+        var previous = $(this).data('prev');
+        var current = $(this).val();
+        $(this).closest('.symptoms-container').find('.symptom-select').not(this).each(function() {
+          $(this).find('option[value="' + previous + '"').attr('disabled', false);
+          $(this).find('option[value="' + current + '"').attr('disabled', true);
+        });
+        $(this).data('prev', current);
+      });
     }
 
     $("input[type='number']").inputSpinner();
@@ -589,6 +647,8 @@
       element.find('#startSymInput0').val('');
       element.find('#endSymInput0').val('');
       element.find('.status-select').find('option').attr('disabled', false);
+      var selected = $('.symptom-group').first().find('option:selected').val();
+      element.find('.symptom-select').find('option[value="' + selected + '"').attr('disabled', true);
     }
     $('#addSymptom').click(function() {
       $('#removeSymptom').attr('disabled', false);
@@ -608,6 +668,8 @@
       $('#addSymptom').attr('disabled', false);
       if (groups == 1) $(this).attr('disabled', true);
       groups--;
+      var selected = $('#symptomsContainer').find('.symptom-group').last().find('.symptom-select').find('option:selected').val();
+      if (selected != '') $('#symptomsContainer').find('.symptom-group').find('.symptom-select').find('option[value="' + selected + '"').attr('disabled', false);
       $('#symptomsContainer').children().last().remove();
       $('#symptomsContainer').children().last().remove();
     });

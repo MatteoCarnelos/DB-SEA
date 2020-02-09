@@ -8,6 +8,27 @@ function delete_report($number)
   return pg_execute('', array($number));
 }
 
+if (isset($_GET['update']) && !empty($_POST)) {
+  $number = $_POST['number'];
+  $symptoms = $_POST['symptoms'];
+  pg_prepare('modSym', '
+    UPDATE "RIPORTA"
+    SET fine = $1, stato = $2, gravità = $3
+    WHERE segnalazione = $4 AND sintomo = $5
+  ');
+  foreach ($symptoms as $symptom) {
+    $result = pg_execute('modSym', array(
+      empty($symptom['end']) ? null : date('Y-m-d', strtotime($symptom['end'])),
+      $symptom['status'],
+      $symptom['severity'],
+      $number,
+      $symptom['name']
+    ));
+    if (!$result) break;
+  }
+  if ($result) include 'success_alert.html';
+}
+
 if (isset($_GET['updatenote']) && !empty($_POST)) {
   $number = $_POST['number'];
   $notes = $_POST['notes'];
