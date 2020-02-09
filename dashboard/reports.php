@@ -492,6 +492,11 @@
                     <form class="needs-validation" method="post" action="reports.php?update" novalidate>
                       <div class="modal-body">
                         Coming soon...
+                        <?php
+                        //$symptom = pg_fetch_array($symptoms);
+                        //print_r($symptom);
+                        ?>
+
                       </div>
                       <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
@@ -549,22 +554,15 @@
         var endPicker = $(this).closest('.symptom-group').find('.endpicker');
         var severitySelect = $(this).closest('.symptom-group').find('.severity-select');
         endPicker.attr('required', ($(this).val() == 'Decesso' || $(this).val() == 'Guarito'));
-        if ($(this).val() == 'Decesso') {
-          severitySelect.val('Fatale');
-          severitySelect.attr('disabled', true);
-        } else if (severitySelect.val() == 'Fatale') {
-          severitySelect.val('');
-          severitySelect.attr('disabled', false);
-        }
+        if ($(this).val() == 'Decesso') severitySelect.val('Fatale');
+        else if (severitySelect.val() == 'Fatale') severitySelect.val('');
       });
       $('.severity-select').change(function() {
         var endPicker = $(this).closest('.symptom-group').find('.endpicker');
         var statusSelect = $(this).closest('.symptom-group').find('.status-select');
         if ($(this).val() == 'Fatale') endPicker.attr('required', true);
-        if ($(this).val() == 'Fatale') {
-          statusSelect.val('Decesso');
-          $(this).attr('disabled', true);
-        }
+        if ($(this).val() == 'Fatale') statusSelect.val('Decesso');
+        else if (statusSelect.val() == 'Decesso') statusSelect.val('');
       });
     }
 
@@ -590,7 +588,6 @@
     function reset(element) {
       element.find('#startSymInput0').val('');
       element.find('#endSymInput0').val('');
-      element.find('.severity-select').attr('disabled', false);
       element.find('.status-select').find('option').attr('disabled', false);
     }
     $('#addSymptom').click(function() {
