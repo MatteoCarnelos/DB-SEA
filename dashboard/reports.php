@@ -617,8 +617,8 @@
         var previous = $(this).data('prev');
         var current = $(this).val();
         $(this).closest('.symptoms-container').find('.symptom-select').not(this).each(function() {
-          $(this).find('option[value="' + previous + '"').attr('disabled', false);
-          $(this).find('option[value="' + current + '"').attr('disabled', true);
+          $(this).find('option[value="' + previous + '"]').attr('disabled', false);
+          $(this).find('option[value="' + current + '"]').attr('disabled', true);
         });
         $(this).data('prev', current);
       });
@@ -648,7 +648,7 @@
       element.find('#endSymInput0').val('');
       element.find('.status-select').find('option').attr('disabled', false);
       var selected = $('.symptom-group').first().find('option:selected').val();
-      element.find('.symptom-select').find('option[value="' + selected + '"').attr('disabled', true);
+      element.find('.symptom-select').find('option[value="' + selected + '"]').attr('disabled', true);
     }
     $('#addSymptom').click(function() {
       $('#removeSymptom').attr('disabled', false);
@@ -669,7 +669,7 @@
       if (groups == 1) $(this).attr('disabled', true);
       groups--;
       var selected = $('#symptomsContainer').find('.symptom-group').last().find('.symptom-select').find('option:selected').val();
-      if (selected != '') $('#symptomsContainer').find('.symptom-group').find('.symptom-select').find('option[value="' + selected + '"').attr('disabled', false);
+      if (selected != '') $('#symptomsContainer').find('.symptom-group').find('.symptom-select').find('option[value="' + selected + '"]').attr('disabled', false);
       $('#symptomsContainer').children().last().remove();
       $('#symptomsContainer').children().last().remove();
     });
