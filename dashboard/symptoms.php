@@ -81,7 +81,7 @@
             <tr>
               <th scope="col">Nome</th>
               <th scope="col">Descrizione</th>
-              <th scope="col">Causato da</th>
+              <th scope="col" class="text-nowrap">Causato da</th>
               <th scope="col"></th>
             </tr>
           </thead>
@@ -126,7 +126,7 @@
 
                   <?php } else { ?>
 
-                    <button class="btn btn-link text-body pl-0 pt-0" data-toggle="modal" data-target="#medicinesModal<?php echo $index ?>" type="button">Visualizza farmaci</button>
+                    <button class="btn btn-link text-body pl-0 pt-0 text-left" data-toggle="modal" data-target="#medicinesModal<?php echo $index ?>" type="button">Visualizza farmaci</button>
                     <div class="modal fade" id="medicinesModal<?php echo $index ?>">
                       <div class="modal-dialog modal-dialog-scrollable">
                         <div class="modal-content">

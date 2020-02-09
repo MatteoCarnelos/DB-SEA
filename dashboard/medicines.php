@@ -158,16 +158,19 @@
                       <option value="Capsule">Capsule</option>
                       <option value="Polvere">Polvere</option>
                       <option value="Granulato">Granulato</option>
+                      <option value="Supposte">Supposte</option>
                       <option disabled value="">Semisolide:</option>
                       <option value="Gel">Gel</option>
                       <option value="Unguente">Unguente</option>
                       <option value="Lubrificante">Lubrificante</option>
                       <option value="Pasta">Pasta</option>
+                      <option value="Pomata">Pomata</option>
                       <option disabled value="">Liquide:</option>
                       <option value="Sciroppo">Sciroppo</option>
                       <option value="Fiale">Fiale</option>
                       <option value="Gocce">Gocce</option>
                       <option value="Collirio">Collirio</option>
+                      <option value="Siringa">Siringa</option>
                       <option disabled value="">Gassose:</option>
                       <option value="Areosol">Areosol</option>
                     </select>
