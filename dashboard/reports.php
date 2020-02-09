@@ -197,8 +197,8 @@
                   </div>
                 </div>
 
-                <div id="symptomsGroup">
-                  <div id="symptom">
+                <div id="symptomsContainer">
+                  <div class="symptom-group">
                     <div class="mt-3 form-group row">
                       <label class="col-1 col-form-label" for="symptomInput0">Sintomo</label>
                       <div class="input-group col-11">
@@ -248,7 +248,7 @@
                     <div class="form-group row">
                       <label class="col-1 col-form-label" for="statusInput0">Stato</label>
                       <div class="col-3">
-                        <select class="custom-select" id="statusInput0" name="symptoms[0][status]" required>
+                        <select class="custom-select status-select" id="statusInput0" name="symptoms[0][status]" required>
                           <option selected disabled value="">Seleziona uno stato...</option>
                           <option value="Decesso">Decesso</option>
                           <option value="Peggiorato">Peggiorato</option>
@@ -259,7 +259,7 @@
                       </div>
                       <label class="col-1 col-form-label" for="severityInput0">Gravità</label>
                       <div class="col-3">
-                        <select class="custom-select" id="severityInput0" name="symptoms[0][severity]" required>
+                        <select class="custom-select severity-select" id="severityInput0" name="symptoms[0][severity]" required>
                           <option selected disabled value="">Seleziona una gravità...</option>
                           <option value="Fatale">Fatale</option>
                           <option value="Pericolo di vita">Pericolo di vita</option>
@@ -510,6 +510,7 @@
   <script>
     feather.replace();
     loadDatepickers();
+    loadSymChecks();
 
     function loadDatepickers() {
       $('.datepicker').datepicker({
@@ -526,6 +527,44 @@
         endPicker.datepicker('setStartDate', startDate);
         var endDate = new Date(endPicker.datepicker('getDate'));
         if (endDate < startDate) endPicker.datepicker('clearDates');
+      });
+    }
+
+    function loadSymChecks() {
+      $('#symptomsContainer').find('.endpicker').change(function() {
+        var statusSelect = $(this).closest('.symptom-group').find('.status-select');
+        var severitySelect = $(this).closest('.symptom-group').find('.severity-select');
+        if ($(this).val() != '') {
+          if (statusSelect.val() != 'Decesso' && statusSelect.val() != 'Guarito' && statusSelect.val() != 'Non noto') statusSelect.val('');
+          statusSelect.find('option[value="Decesso"]').attr('disabled', false);
+          statusSelect.find('option[value="Peggiorato"]').attr('disabled', true);
+          statusSelect.find('option[value="Migliorato"]').attr('disabled', true);
+          statusSelect.find('option[value="Guarito"]').attr('disabled', false);
+        } else {
+          statusSelect.find('option').attr('disabled', false);
+          statusSelect.find('option[value=""]').attr('disabled', true);
+        }
+      });
+      $('.status-select').change(function() {
+        var endPicker = $(this).closest('.symptom-group').find('.endpicker');
+        var severitySelect = $(this).closest('.symptom-group').find('.severity-select');
+        endPicker.attr('required', ($(this).val() == 'Decesso' || $(this).val() == 'Guarito'));
+        if ($(this).val() == 'Decesso') {
+          severitySelect.val('Fatale');
+          severitySelect.attr('disabled', true);
+        } else if (severitySelect.val() == 'Fatale') {
+          severitySelect.val('');
+          severitySelect.attr('disabled', false);
+        }
+      });
+      $('.severity-select').change(function() {
+        var endPicker = $(this).closest('.symptom-group').find('.endpicker');
+        var statusSelect = $(this).closest('.symptom-group').find('.status-select');
+        if ($(this).val() == 'Fatale') endPicker.attr('required', true);
+        if ($(this).val() == 'Fatale') {
+          statusSelect.val('Decesso');
+          $(this).attr('disabled', true);
+        }
       });
     }
 
@@ -547,26 +586,33 @@
         $(this).attr(attr, forAttr.replace('0', groups));
       });
     }
+
+    function reset(element) {
+      element.find('#startSymInput0').val('');
+      element.find('#endSymInput0').val('');
+      element.find('.severity-select').attr('disabled', false);
+      element.find('.status-select').find('option').attr('disabled', false);
+    }
     $('#addSymptom').click(function() {
       $('#removeSymptom').attr('disabled', false);
       if (groups == 3) $(this).attr('disabled', true);
       groups++;
-      $('#symptomsGroup').append('<hr>');
-      var clonedSymptom = $('#symptom').first().clone();
-      clonedSymptom.find('#startSymInput0').val('');
-      clonedSymptom.find('#endSymInput0').val('');
+      $('#symptomsContainer').append('<hr>');
+      var clonedSymptom = $('.symptom-group').first().clone();
+      reset(clonedSymptom);
       updateAttr(clonedSymptom, 'for');
       updateAttr(clonedSymptom, 'id');
       updateAttr(clonedSymptom, 'name');
-      clonedSymptom.appendTo('#symptomsGroup');
+      clonedSymptom.appendTo('#symptomsContainer');
       loadDatepickers();
+      loadSymChecks();
     });
     $('#removeSymptom').click(function() {
       $('#addSymptom').attr('disabled', false);
       if (groups == 1) $(this).attr('disabled', true);
       groups--;
-      $('#symptomsGroup').children().last().remove();
-      $('#symptomsGroup').children().last().remove();
+      $('#symptomsContainer').children().last().remove();
+      $('#symptomsContainer').children().last().remove();
     });
 
     (function() {
