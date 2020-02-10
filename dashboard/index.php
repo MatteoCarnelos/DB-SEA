@@ -154,6 +154,8 @@
                         <th scope="row"><?php echo $report['numero'] ?></th>
                         <td>
                           <?php echo "{$report['nome_medico']} {$report['cognome']}" ?>
+                          <br>
+                          <span class="text-white-50"><?php if (isset($report['telefono'])) echo "tel. {$report['telefono']}" ?></span>
                         </td>
                         <td>
                           <?php
@@ -164,7 +166,8 @@
                           <span class="text-white-50">Anni <?php echo $report['età'] ?></span>
                         </td>
                         <td>
-                          <?php echo "{$report['nome_farmaco']} {$report['forma']}" ?> <br>
+                          <?php echo "{$report['nome_farmaco']} {$report['forma']}" ?>
+                          <br>
                           <span class="text-white-50"><?php echo $report['principio_attivo'] ?></span>
                         </td>
                         <td>

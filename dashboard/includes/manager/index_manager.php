@@ -24,7 +24,7 @@ if ($result) {
 $query = '
   SELECT DISTINCT
     S.numero,
-    M.nome AS nome_medico, M.cognome,
+    M.nome AS nome_medico, M.cognome, M.telefono,
     P.iniziali, P.età,
     F.nome AS nome_farmaco, F.forma, F.principio_attivo
   FROM "SEGNALAZIONE" AS S 
