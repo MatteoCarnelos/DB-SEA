@@ -36,9 +36,9 @@
         <?php include 'includes/handler/connection_handler.php' ?>
         <?php include 'includes/manager/index_manager.php' ?>
 
-        <div class="row mb-3">
-          <div class="col-4">
-            <div class="card text-dark bg-warning">
+        <div class="row">
+          <div class="col-4 pr-0">
+            <div class="card text-dark bg-warning mb-3">
               <h5 class="card-header">Farmaco più segnalato</h5>
               <div class="card-body">
                 <h4 class="card-title">
@@ -77,6 +77,53 @@
               </div>
               <div class="card-footer text-right">
                 <button class="btn btn-outline-dark text-hover-warning" type="button" onClick="window.location.reload();">
+                  <i data-feather="play"></i>
+                  Esegui query
+                </button>
+              </div>
+            </div>
+            <div class="card text-white bg-info">
+              <h5 class="card-header">Farmaco più problematico per la gravidanza</h5>
+              <div class="card-body">
+                <h4 class="card-title">
+                  <?php
+                  if (!isset($medicine4)) echo 'Query non eseguita';
+                  else if (empty($medicine4)) echo 'Nessun sintomo grave segnalato in gravidanza';
+                  else echo "{$medicine4['nome']} {$medicine4['forma']}";
+                  ?>
+                </h4>
+                <p class="card-text">
+                  Totale sintomi gravi segnalati: <b>
+                    <?php
+                    if (!isset($medicine4) || empty($medicine4)) echo '...';
+                    else echo $medicine4['sintomi'];
+                    ?>
+                  </b><br>
+                  Codice farmaco: <b>
+                    <?php
+                    if (!isset($medicine4) || empty($medicine4)) echo '...';
+                    else echo $medicine4['farmaco'];
+                    ?>
+                  </b><br>
+                  Via di somministrazione: <b>
+                    <?php
+                    if (!isset($medicine4) || empty($medicine4)) echo '...';
+                    else echo $medicine4['somministrazione'];
+                    ?>
+                  </b><br>
+                  Principio attivo: <b>
+                    <?php
+                    if (!isset($medicine4) || empty($medicine4)) echo '...';
+                    else echo $medicine4['principio_attivo'];
+                    ?>
+                  </b><br>
+                </p>
+                <p class="card-text text-white-50">
+                  Con "sintomo grave" si intende un sintomo con gravità che non sia "Non definita" o "Non grave".
+                </p>
+              </div>
+              <div class="card-footer text-right">
+                <button class="btn btn-outline-light text-hover-info" onClick="window.location.reload();" type="button">
                   <i data-feather="play"></i>
                   Esegui query
                 </button>
@@ -139,12 +186,7 @@
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-6">
-            <div class="card bg-light border-dark mb-3">
+            <div class="card bg-light border-dark">
               <h5 class="card-header">Ricerca sintomi segnalati per farmaco</h5>
               <div class="card-body">
                 <form class="needs-validation" method="post" action="index.php?search" novalidate>
@@ -202,57 +244,6 @@
                     <?php } ?>
                   </tbody>
                 </table>
-              </div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="card text-white bg-info">
-              <h5 class="card-header">Farmaco più problematico per la gravidanza</h5>
-              <div class="card-body">
-                <h4 class="card-title">
-                  <?php
-                  if (!isset($medicine4)) echo 'Query non eseguita';
-                  else if (empty($medicine4)) echo 'Nessun sintomo grave segnalato in gravidanza';
-                  else echo "{$medicine4['nome']} {$medicine4['forma']}";
-                  ?>
-                </h4>
-                <div class="row">
-                  <p class="card-text col-6 mb-0">
-                    Totale sintomi gravi segnalati: <b>
-                      <?php
-                      if (!isset($medicine4) || empty($medicine4)) echo '...';
-                      else echo $medicine4['sintomi'];
-                      ?>
-                    </b><br>
-                    Codice farmaco: <b>
-                      <?php
-                      if (!isset($medicine4) || empty($medicine4)) echo '...';
-                      else echo $medicine4['farmaco'];
-                      ?>
-                    </b><br>
-                    Via di somministrazione: <b>
-                      <?php
-                      if (!isset($medicine4) || empty($medicine4)) echo '...';
-                      else echo $medicine4['somministrazione'];
-                      ?>
-                    </b><br>
-                    Principio attivo: <b>
-                      <?php
-                      if (!isset($medicine4) || empty($medicine4)) echo '...';
-                      else echo $medicine4['principio_attivo'];
-                      ?>
-                    </b><br>
-                  </p>
-                  <p class="card-text col-6 text-white-50">
-                    Con "sintomo grave" si intende un sintomo con gravità che non sia "Non definita" o "Non grave".
-                  </p>
-                </div>
-              </div>
-              <div class="card-footer text-right">
-                <button class="btn btn-outline-light text-hover-info" onClick="window.location.reload();" type="button">
-                  <i data-feather="play"></i>
-                  Esegui query
-                </button>
               </div>
             </div>
           </div>
