@@ -132,7 +132,7 @@
           </div>
           <div class="col-8">
             <div class="card text-white bg-dark mb-3">
-              <h5 class="card-header">Casi di decesso per sintomi non noti</h5>
+              <h5 class="card-header">Casi di decesso per sintomi non conosciuti</h5>
               <div class="card-body">
                 <table class="table table-dark mb-0">
                   <thead>
