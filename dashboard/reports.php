@@ -566,6 +566,26 @@
     loadDatepickers();
     loadSymChecks();
 
+    $('#dateInput').change(function() {
+      var date = $(this).datepicker('getDate');
+      $('.startpicker').each(function() {
+        $(this).datepicker('setEndDate', date);
+        if ($(this).val() != '') {
+          var parts = $(this).val().split('-');
+          var startDate = new Date(parts[2], parts[1] - 1, parts[0]);
+          if (startDate > date) $(this).datepicker('clearDates');
+        }
+      });
+      $('#symptomsContainer').find('.endpicker').each(function() {
+        $(this).datepicker('setEndDate', date);
+        if ($(this).val() != '') {
+          var parts = $(this).val().split('-');
+          var endDate = new Date(parts[2], parts[1] - 1, parts[0]);
+          if (endDate > date) $(this).datepicker('clearDates');
+        }
+      });
+    });
+
     function loadDatepickers() {
       $('.datepicker').datepicker({
         language: 'it',
@@ -582,6 +602,8 @@
         var endDate = new Date(endPicker.datepicker('getDate'));
         if (endDate < startDate) endPicker.datepicker('clearDates');
       });
+      $('.startpicker').datepicker('setEndDate', $('#dateInput').val());
+      $('#symptomsContainer').find('.endpicker').datepicker('setEndDate', $('#dateInput').val());
     }
 
     function loadSymChecks() {

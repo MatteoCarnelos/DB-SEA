@@ -27,6 +27,6 @@
     <div class="mx-auto mt-auto mb-1">
       <img src="includes/img/logo-unipd.png" style="width: 75px; height: 75px;" class="img-fluid" alt="Unipd Logo">
     </div>
-    <p class="text-muted text-center"><small>Carnelos - Kumar - Provera</small></p>
+    <p class="text-muted text-center"><small>Carnelos - Kumar - Provera<br>A.A. 2019/2020</small></p>
   </div>
 </nav>
