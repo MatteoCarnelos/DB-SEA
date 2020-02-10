@@ -37,8 +37,8 @@
         <?php include 'includes/manager/index_manager.php' ?>
 
         <div class="row mb-3">
-          <div class="col-6">
-            <div class="card text-dark bg-warning mb-3">
+          <div class="col-4">
+            <div class="card text-dark bg-warning">
               <h5 class="card-header">Farmaco più segnalato</h5>
               <div class="card-body">
                 <h4 class="card-title">
@@ -82,7 +82,8 @@
                 </button>
               </div>
             </div>
-
+          </div>
+          <div class="col-8">
             <div class="card text-white bg-dark mb-3">
               <h5 class="card-header">Casi di decesso per sintomi non noti</h5>
               <div class="card-body">
@@ -111,8 +112,9 @@
                           <?php
                           foreach (str_split($report['iniziali']) as $initial)
                             echo "$initial. ";
-                          echo "(Anni {$report['età']})";
                           ?>
+                          <br>
+                          <span class="text-white-50">Anni <?php echo $report['età'] ?></span>
                         </td>
                         <td>
                           <?php echo "{$report['nome_farmaco']} {$report['forma']}" ?> <br>
@@ -138,7 +140,9 @@
               </div>
             </div>
           </div>
+        </div>
 
+        <div class="row">
           <div class="col-6">
             <div class="card bg-light border-dark mb-3">
               <h5 class="card-header">Ricerca sintomi segnalati per farmaco</h5>
@@ -200,7 +204,8 @@
                 </table>
               </div>
             </div>
-
+          </div>
+          <div class="col-6">
             <div class="card text-white bg-info">
               <h5 class="card-header">Farmaco più problematico per la gravidanza</h5>
               <div class="card-body">
@@ -212,7 +217,7 @@
                   ?>
                 </h4>
                 <div class="row">
-                  <p class="card-text col-6">
+                  <p class="card-text col-6 mb-0">
                     Totale sintomi gravi segnalati: <b>
                       <?php
                       if (!isset($medicine4) || empty($medicine4)) echo '...';
