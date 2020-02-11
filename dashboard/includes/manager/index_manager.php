@@ -62,10 +62,13 @@ if ($result) {
 if (isset($_GET['search']) && !empty($_POST)) {
   $medicine = $_POST['medicine'];
   pg_prepare('', '
-    SELECT R.sintomo, COUNT(*) AS segnalazioni
-    FROM "RIPORTA" AS R JOIN "PAZIENTE" AS P ON R.segnalazione = P.segnalazione
+    SELECT R.sintomo, COUNT(*) AS segnalazioni, C.conosciuto
+    FROM "RIPORTA" AS R 
+      JOIN "PAZIENTE" AS P ON R.segnalazione = P.segnalazione
+      JOIN "CAUSA" AS C ON R.sintomo = C.sintomo 
+        AND P.farmaco = C.farmaco
     WHERE P.farmaco = $1
-    GROUP BY R.sintomo
+    GROUP BY R.sintomo, C.conosciuto
     ORDER BY segnalazioni DESC
   ');
   $result = pg_execute('', array($medicine));

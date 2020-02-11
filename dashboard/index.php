@@ -228,6 +228,7 @@
                         Numero segnalazioni
                         <i data-feather="arrow-up" class="ml-1"></i>
                       </th>
+                      <th scope="col">Conosciuto</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -242,6 +243,9 @@
                         </th>
                         <td>
                           <?php echo $symptom['segnalazioni'] ?>
+                        </td>
+                        <td>
+                          <?php echo ($symptom['conosciuto'] == 't') ? 'Si' : 'No' ?>
                         </td>
                       </tr>
                     <?php } ?>
