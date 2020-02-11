@@ -175,7 +175,7 @@
                       <option value="Collirio">Collirio</option>
                       <option value="Siringa">Siringa</option>
                       <option disabled value="">Gassose:</option>
-                      <option value="Areosol">Areosol</option>
+                      <option value="Aerosol">Aerosol</option>
                     </select>
                   </div>
                 </div>
