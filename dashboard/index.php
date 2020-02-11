@@ -82,7 +82,7 @@
                 </button>
               </div>
             </div>
-            <div class="card text-white bg-info">
+            <div class="card text-white bg-info mb-3">
               <h5 class="card-header">Farmaco più problematico per la gravidanza</h5>
               <div class="card-body">
                 <h4 class="card-title">
@@ -155,7 +155,7 @@
                         <td>
                           <?php echo "{$report['nome_medico']} {$report['cognome']}" ?>
                           <br>
-                          <span class="text-white-50"><?php if (isset($report['telefono'])) echo "tel. {$report['telefono']}" ?></span>
+                          <span class="text-white-50">tel. <?php echo isset($report['telefono']) ? $report['telefono'] : 'non fornito' ?></span>
                         </td>
                         <td>
                           <?php
@@ -189,7 +189,7 @@
                 </button>
               </div>
             </div>
-            <div class="card bg-light border-dark">
+            <div class="card bg-light border-dark mb-3">
               <h5 class="card-header">Ricerca sintomi segnalati per farmaco</h5>
               <div class="card-body">
                 <form class="needs-validation" method="post" action="index.php?search" novalidate>
