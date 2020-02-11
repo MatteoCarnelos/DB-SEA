@@ -205,6 +205,7 @@
                         $query = '
                         SELECT codice, nome, forma
                         FROM "FARMACO"
+                        ORDER BY nome, forma
                       ';
                         $medicines = pg_query($query);
                         while ($medicine = pg_fetch_array($medicines, null, PGSQL_ASSOC)) {

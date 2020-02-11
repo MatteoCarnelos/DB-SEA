@@ -74,10 +74,11 @@
                       $query = '
                         SELECT id, nome, cognome
                         FROM "MEDICO"
+                        ORDER BY cognome, nome
                       ';
                       $doctors = pg_query($query);
                       while ($doctor = pg_fetch_array($doctors, null, PGSQL_ASSOC))
-                        echo "<option value='{$doctor['id']}'>{$doctor['nome']} {$doctor['cognome']}</option>";
+                        echo "<option value='{$doctor['id']}'>{$doctor['cognome']} {$doctor['nome']}</option>";
                       ?>
                     </select>
                     <div class="input-group-append">
@@ -139,6 +140,7 @@
                       $query = '
                         SELECT codice, nome, forma
                         FROM "FARMACO"
+                        ORDER BY nome, forma
                       ';
                       $medicines = pg_query($query);
                       while ($medicine = pg_fetch_array($medicines, null, PGSQL_ASSOC))
@@ -211,6 +213,7 @@
                           $query = '
                             SELECT nome
                             FROM "SINTOMO"
+                            ORDER BY nome
                           ';
                           $symptoms = pg_query($query);
                           while ($symptom = pg_fetch_array($symptoms, null, PGSQL_ASSOC))
